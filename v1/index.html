@@ -6,11 +6,11 @@
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0d0d0f">
 <title>cymatics — v1 (membrane approx)</title>
-<link rel="stylesheet" href="styles.css?v=6fb15131">
+<link rel="stylesheet" href="styles.css?v=bc80c1ef">
 
 <!-- PWA -->
-<link rel="manifest" href="manifest.webmanifest?v=6fb15131">
-<link rel="apple-touch-icon" href="icons/icon.svg?v=6fb15131">
+<link rel="manifest" href="manifest.webmanifest?v=bc80c1ef">
+<link rel="apple-touch-icon" href="icons/icon.svg?v=bc80c1ef">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="cymatics">
@@ -18,9 +18,9 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <meta name="cb" content="6fb15131">
-  <link rel="icon" type="image/svg+xml" href="./cb-shapes/47.svg?v=6fb15131">
-  <script src="./cb-badge.js?v=6fb15131" defer></script>
+  <meta name="cb" content="bc80c1ef">
+  <link rel="icon" type="image/svg+xml" href="./cb-shapes/60.svg?v=bc80c1ef">
+  <script src="./cb-badge.js?v=bc80c1ef" defer></script>
 </head>
 <body>
 <main id="stage">
@@ -29,40 +29,43 @@
   </div>
 
   <aside id="controls">
-    <header>
+    <header class="head">
       <h1>cymatics</h1>
-      <p class="caveat">
-        <span class="mode-badge" id="mode-badge">MODE: membrane approx (m,n)</span>
-        <span class="hint">v1 toy field — the membrane/Helmholtz superposition, not the Kirchhoff plate. v2 replaces this.</span>
-      </p>
+      <div class="badge-row">
+        <span class="mode-badge" id="mode-badge">MODE: membrane approx</span>
+        <button type="button" class="about-btn" id="about-btn"
+                aria-haspopup="dialog" aria-label="about / formulas">+</button>
+      </div>
     </header>
 
-    <section class="braille-slider" id="slot-m"   data-key="m"></section>
-    <section class="braille-slider" id="slot-n"   data-key="n"></section>
-    <p class="warn" id="mn-warn" hidden>m must differ from n — the field vanishes identically.</p>
-
-    <section class="braille-slider" id="slot-count" data-key="count"></section>
-    <section class="braille-slider" id="slot-temp"  data-key="temp"></section>
-    <section class="braille-slider" id="slot-speed" data-key="speed"></section>
-
-    <section class="control row">
-      <label class="toggle"><input type="checkbox" id="continuous"> continuous</label>
-      <label class="toggle"><input type="checkbox" id="auto"> auto-cycle</label>
+    <section class="bsl-grid">
+      <div id="slot-m"></div>
+      <div id="slot-n"></div>
+      <p class="warn bsl-wide" id="mn-warn" hidden>m must differ from n — the field vanishes.</p>
+      <div id="slot-temp"></div>
+      <div id="slot-speed"></div>
+      <div id="slot-count" class="bsl-wide"></div>
     </section>
 
-    <section class="control row">
-      <label class="toggle"><input type="checkbox" id="pause"> pause</label>
-      <button type="button" id="reseed">reseed</button>
+    <section class="iconbar" aria-label="playback controls">
+      <button type="button" class="icon-btn" id="pause-btn"
+              aria-pressed="false" aria-label="pause">⏸</button>
+      <button type="button" class="icon-btn" id="continuous-btn"
+              aria-pressed="false" aria-label="continuous (settle-driven swap)">∞</button>
+      <button type="button" class="icon-btn" id="cycle-btn"
+              aria-pressed="false" aria-label="auto-cycle (timer-driven swap)">↻</button>
+      <button type="button" class="icon-btn" id="reseed-btn"
+              aria-label="reseed particles">↺</button>
     </section>
 
     <section class="audio">
       <header class="audio-head">
         <span class="audio-title">scope</span>
         <span class="audio-freq" id="freq">— Hz</span>
-        <button type="button" id="audio-toggle" class="audio-btn" aria-pressed="false">unmute</button>
+        <button type="button" id="audio-toggle" class="icon-btn icon-btn-text"
+                aria-pressed="false" aria-label="unmute audio">🔇</button>
       </header>
       <canvas id="scope" width="276" height="64"></canvas>
-      <p class="audio-hint">synth tone keyed to (m,n) — f ∝ √(m² + n²). this is the v1 cheat frequency; not a real plate eigenfrequency.</p>
     </section>
 
     <section class="readout">
@@ -72,13 +75,49 @@
         <dt>particles</dt><dd id="live-count">—</dd>
       </dl>
     </section>
-
-    <footer>
-      <p class="ref">f(x,y) = cos(nπx/L)·cos(mπy/L) − cos(mπx/L)·cos(nπy/L)</p>
-    </footer>
   </aside>
 </main>
 
-<script type="module" src="src/main.js?v=6fb15131"></script>
+<dialog id="about-dialog" class="about" aria-labelledby="about-title">
+  <div class="about-content">
+    <button type="button" class="about-close" aria-label="close">×</button>
+    <h2 id="about-title">cymatics — v1</h2>
+
+    <h3>what this is</h3>
+    <p>v1 toy field — the <em>membrane / Helmholtz</em> superposition, not the
+    Kirchhoff plate. It looks right and is physically wrong. v2 will replace
+    this with a real <code>scikit-fem</code> biharmonic eigensolve on a
+    free-edge plate.</p>
+
+    <h3>field</h3>
+    <p class="formula">f(x, y) = cos(nπx/L) · cos(mπy/L) − cos(mπx/L) · cos(nπy/L)</p>
+    <p>Nodal set is <code>f = 0</code>; particles flow down the gradient of
+    <code>|f|</code>. <code>m = n</code> yields nothing — guarded.</p>
+
+    <h3>synth tone</h3>
+    <p>Frequency keyed to the mode: <span class="formula">f ∝ √(m² + n²)</span>.
+    This is the v1 cheat frequency, not a real plate eigenfrequency. Default
+    muted; tap the icon in the scope panel to enable.</p>
+
+    <h3>continuous vs. auto-cycle</h3>
+    <p><strong>∞</strong> swaps to a new <code>(m, n)</code> once particles
+    have <em>settled</em> on the current pattern (an EMA of mean particle
+    speed crosses a threshold). <strong>↻</strong> swaps on a fixed timer.
+    Either can be on; if both are on, settle wins.</p>
+
+    <h3>physics distinctions kept honest</h3>
+    <ul>
+      <li><strong>Plate</strong> (real Chladni, v2): 4th-order biharmonic, nodal lines.</li>
+      <li><strong>Membrane</strong> (the v1 cheat): 2nd-order, drumhead.</li>
+      <li><strong>Inverse Chladni</strong>: powder to antinodes via acoustic streaming. Out of scope.</li>
+      <li><strong>Faraday waves</strong>: liquid surface, Mathieu equation. Out of scope.</li>
+    </ul>
+
+    <p class="meta">Source: <a href="https://github.com/kai-denrei/cymatics-beauty"
+                              target="_blank" rel="noopener">github.com/kai-denrei/cymatics-beauty</a></p>
+  </div>
+</dialog>
+
+<script type="module" src="src/main.js?v=bc80c1ef"></script>
 </body>
 </html>

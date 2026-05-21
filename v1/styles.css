@@ -1,6 +1,6 @@
 /* cymatics v1 — editorial dark, mono numbers, amber/teal accents.
    Layout adapts between portrait (canvas top, controls scroll below) and
-   landscape ≥720px (canvas left, controls right at 340px). */
+   landscape >= 720px (canvas left, controls right at 340px). */
 
 :root {
   --bg: #0d0d0f;
@@ -38,7 +38,7 @@ body {
   overflow: hidden;
 }
 
-/* ── Portrait / compact (default) ──────────────────────────────────────── */
+/* ── Stage ─────────────────────────────────────────────────────────────── */
 #stage {
   display: grid;
   grid-template-columns: 1fr;
@@ -69,69 +69,106 @@ body {
 #controls {
   background: var(--bg-elev);
   border-top: 1px solid var(--rule);
-  padding: 16px 18px max(20px, env(safe-area-inset-bottom));
+  padding: 14px 16px max(16px, env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-#controls header h1 {
+/* ── Header (h1 + badge + "+") ────────────────────────────────────────── */
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.head h1 {
   font-family: var(--serif);
   font-weight: 400;
-  font-size: 24px;
+  font-size: 22px;
   letter-spacing: 0.02em;
-  margin: 0 0 4px 0;
+  margin: 0;
   color: var(--ink);
 }
 
-.caveat {
-  margin: 0;
+.badge-row {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 8px;
 }
 
 .mode-badge {
   font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.05em;
+  font-size: 10px;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--amber);
-  padding: 4px 8px;
+  padding: 3px 8px;
   border: 1px solid var(--amber);
-  align-self: flex-start;
   border-radius: 1px;
+  white-space: nowrap;
 }
 
-.hint {
-  font-style: italic;
+.about-btn {
+  background: transparent;
+  border: 1px solid var(--rule);
   color: var(--ink-dim);
-  font-size: 12px;
-  line-height: 1.3;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-family: var(--mono);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 120ms ease, color 120ms ease;
 }
 
-/* ── Braille slider ───────────────────────────────────────────────────── */
+.about-btn:hover,
+.about-btn:focus-visible {
+  border-color: var(--teal);
+  color: var(--teal);
+  outline: none;
+}
+
+/* ── Braille slider grid ──────────────────────────────────────────────── */
+.bsl-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 12px;
+}
+
+.bsl-grid > .bsl-wide,
+.bsl-grid > p.bsl-wide {
+  grid-column: 1 / -1;
+}
+
 .bsl {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
+  min-width: 0;       /* allow grid item to shrink below content width */
 }
 
 .bsl-head {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  gap: 6px;
   font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.06em;
+  font-size: 10px;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--ink-dim);
 }
 
 .bsl-value {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--teal);
   text-transform: none;
   letter-spacing: 0;
@@ -141,7 +178,7 @@ body {
 .bsl-row {
   display: grid;
   grid-template-columns: var(--tap-min) 1fr var(--tap-min);
-  gap: 8px;
+  gap: 6px;
   align-items: stretch;
 }
 
@@ -150,7 +187,8 @@ body {
   border: 1px solid var(--rule);
   color: var(--ink-dim);
   font-family: var(--mono);
-  font-size: 22px;
+  font-size: 20px;
+  font-weight: 700;
   line-height: 1;
   min-height: var(--tap-min);
   min-width: var(--tap-min);
@@ -159,9 +197,12 @@ body {
   border-radius: 1px;
   transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
   touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .bsl-btn:hover,
+.bsl-btn-active,
 .bsl-btn:active {
   border-color: var(--amber);
   color: var(--amber);
@@ -172,9 +213,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   font-family: var(--mono);
-  font-size: 28px;
+  font-size: 22px;
   line-height: 1;
   min-height: var(--tap-min);
   border: 1px solid var(--rule);
@@ -185,122 +226,83 @@ body {
   touch-action: none;
   outline: none;
   background: rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  min-width: 0;
 }
 
-.bsl-bar:focus-visible {
-  border-color: var(--teal);
-}
+.bsl-bar:focus-visible { border-color: var(--teal); }
 
 .bsl-bar span {
   display: inline-block;
-  padding: 0 1px;
+  padding: 0;
 }
 
-/* ── Toggle row ───────────────────────────────────────────────────────── */
-.control.row {
+/* ── Icon-button row (pause / continuous / cycle / reseed) ─────────────── */
+.iconbar {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 14px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
-.toggle {
+.icon-btn {
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 18px;
+  line-height: 1;
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  padding: 0 10px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: border-color 140ms ease, color 140ms ease, background 140ms ease;
+  touch-action: manipulation;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-family: var(--mono);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ink-dim);
-  min-height: var(--tap-min);
+  justify-content: center;
 }
 
-.toggle input {
-  accent-color: var(--teal);
-  width: 18px;
-  height: 18px;
-}
-
-button#reseed,
-.audio-btn {
-  background: transparent;
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 8px 14px;
-  min-height: var(--tap-min);
-  cursor: pointer;
-  border-radius: 1px;
-  transition: border-color 120ms ease, color 120ms ease;
-}
-
-button#reseed:hover,
-.audio-btn:hover {
+.icon-btn:hover,
+.icon-btn:active {
   border-color: var(--teal);
   color: var(--teal);
 }
 
+.icon-btn[aria-pressed="true"] {
+  border-color: var(--amber);
+  color: var(--amber);
+  background: rgba(217, 164, 65, 0.10);
+}
+
+.icon-btn.pulse {
+  animation: btn-pulse 240ms ease-out;
+}
+
+@keyframes btn-pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+
+.icon-btn-text {
+  font-family: var(--mono);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+/* ── Warning row ──────────────────────────────────────────────────────── */
 .warn {
   font-family: var(--mono);
   font-size: 11px;
   color: var(--warn);
-  margin: -6px 0 0 0;
-}
-
-/* ── Readout dl ───────────────────────────────────────────────────────── */
-.readout {
-  border-top: 1px solid var(--rule);
-  padding-top: 14px;
-}
-
-.readout dl {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 4px 16px;
   margin: 0;
-  font-family: var(--mono);
-  font-size: 12px;
 }
 
-.readout dt {
-  color: var(--ink-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-size: 11px;
-}
-
-.readout dd {
-  margin: 0;
-  color: var(--teal);
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-#controls footer {
-  margin-top: auto;
-  border-top: 1px solid var(--rule);
-  padding-top: 12px;
-}
-
-.ref {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--ink-dim);
-  margin: 0;
-  line-height: 1.6;
-  word-break: break-word;
-}
-
-/* ── Audio panel + scope canvas ───────────────────────────────────────── */
+/* ── Audio + scope ────────────────────────────────────────────────────── */
 .audio {
   border-top: 1px solid var(--rule);
-  padding-top: 14px;
+  padding-top: 12px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -315,8 +317,8 @@ button#reseed:hover,
 
 .audio-title {
   font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.06em;
+  font-size: 10px;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--ink-dim);
 }
@@ -329,29 +331,160 @@ button#reseed:hover,
   text-align: right;
 }
 
-.audio-btn[aria-pressed="true"] {
-  border-color: var(--teal);
-  color: var(--teal);
-}
-
 #scope {
   display: block;
   width: 100%;
-  height: 64px;
+  height: 56px;
   background: #0a0a0c;
   border: 1px solid var(--rule);
   image-rendering: auto;
 }
 
-.audio-hint {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--ink-dim);
-  line-height: 1.4;
-  margin: 0;
+/* ── Readout dl ───────────────────────────────────────────────────────── */
+.readout {
+  border-top: 1px solid var(--rule);
+  padding-top: 10px;
+  margin-top: auto;
 }
 
-/* ── Wide / desktop / landscape ≥ 720px ───────────────────────────────── */
+.readout dl {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr auto;
+  gap: 4px 12px;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  align-items: baseline;
+}
+
+.readout dt {
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 10px;
+}
+
+.readout dd {
+  margin: 0;
+  color: var(--teal);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Cache-bust badge dodge for iOS notch ─────────────────────────────── */
+#cb-badge {
+  bottom: max(8px, env(safe-area-inset-bottom)) !important;
+  right:  max(8px, env(safe-area-inset-right))  !important;
+}
+
+/* ── About dialog ─────────────────────────────────────────────────────── */
+dialog.about {
+  background: var(--bg-elev);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0;
+  max-width: min(560px, 92vw);
+  width: 100%;
+  max-height: 86dvh;
+  overflow: auto;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+}
+
+dialog.about::backdrop {
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.about-content {
+  padding: 28px 28px 24px;
+  position: relative;
+  font-family: var(--serif);
+  line-height: 1.55;
+}
+
+.about-content h2 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 22px;
+  margin: 0 0 12px;
+  padding-right: 40px;     /* room for close button */
+  color: var(--amber);
+  letter-spacing: 0.01em;
+}
+
+.about-content h3 {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin: 18px 0 4px;
+}
+
+.about-content p,
+.about-content ul {
+  font-size: 14px;
+  margin: 0;
+  color: var(--ink);
+}
+
+.about-content ul {
+  padding-left: 18px;
+}
+
+.about-content li {
+  margin: 4px 0;
+}
+
+.about-content code {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--teal);
+}
+
+.about-content .formula {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--teal);
+  padding: 6px 0;
+  word-break: break-word;
+}
+
+.about-content .meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-dim);
+  margin-top: 22px;
+  border-top: 1px solid var(--rule);
+  padding-top: 12px;
+}
+
+.about-content a {
+  color: var(--teal);
+}
+
+.about-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--ink-dim);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-close:hover { border-color: var(--teal); color: var(--teal); }
+
+/* ── Wide / desktop / landscape >= 720px ──────────────────────────────── */
 @media (min-width: 720px) {
   #stage {
     grid-template-columns: 1fr 340px;
@@ -373,19 +506,11 @@ button#reseed:hover,
   #controls {
     border-top: 0;
     border-left: 1px solid var(--rule);
-    padding: 22px 22px max(22px, env(safe-area-inset-bottom));
-    gap: 16px;
+    padding: 18px 20px max(18px, env(safe-area-inset-bottom));
+    gap: 14px;
   }
 
-  #controls header h1 {
-    font-size: 28px;
-  }
+  .head h1 { font-size: 26px; }
 
-  .bsl-bar { font-size: 30px; }
-}
-
-/* ── Cache-bust badge (third-party widget) safe-area dodge ─────────────── */
-#cb-badge {
-  bottom: max(8px, env(safe-area-inset-bottom)) !important;
-  right:  max(8px, env(safe-area-inset-right))  !important;
+  .bsl-bar { font-size: 24px; }
 }
