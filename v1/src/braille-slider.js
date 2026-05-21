@@ -91,20 +91,18 @@ export class BrailleSlider {
   _build(mount) {
     mount.classList.add("bsl");
     mount.innerHTML = `
-      <div class="bsl-head">
+      <button type="button" class="bsl-step bsl-step-labeled" data-dir="-1"
+              aria-label="decrease ${this.label}">
         <span class="bsl-label">${this.label}</span>
-        <span class="bsl-value"></span>
-      </div>
-      <div class="bsl-row">
-        <button type="button" class="bsl-btn" data-dir="-1" aria-label="decrease ${this.label}">&lt;</button>
-        <div class="bsl-bar" role="slider" tabindex="0"
-             aria-label="${this.label}"></div>
-        <button type="button" class="bsl-btn" data-dir="1" aria-label="increase ${this.label}">&gt;</button>
-      </div>
+        <span class="bsl-arrow">&lt;</span>
+      </button>
+      <div class="bsl-bar" role="slider" tabindex="0"
+           aria-label="${this.label}"></div>
+      <button type="button" class="bsl-step" data-dir="1"
+              aria-label="increase ${this.label}">&gt;</button>
     `;
-    this.valueEl = mount.querySelector(".bsl-value");
-    this.barEl   = mount.querySelector(".bsl-bar");
-    this.btns    = mount.querySelectorAll(".bsl-btn");
+    this.barEl = mount.querySelector(".bsl-bar");
+    this.btns  = mount.querySelectorAll(".bsl-step");
 
     for (const btn of this.btns) {
       const dir = parseInt(btn.dataset.dir, 10);
@@ -129,7 +127,7 @@ export class BrailleSlider {
       if (e.pointerType === "mouse" && e.button !== 0) return;
       armed = true;
       didRepeat = false;
-      btn.classList.add("bsl-btn-active");
+      btn.classList.add("bsl-step-active");
       try { btn.setPointerCapture(e.pointerId); } catch { /* no-op */ }
       holdT = setTimeout(() => {
         didRepeat = true;
@@ -143,7 +141,7 @@ export class BrailleSlider {
       armed = false;
       clearTimeout(holdT);
       clearInterval(repeatT);
-      btn.classList.remove("bsl-btn-active");
+      btn.classList.remove("bsl-step-active");
       if (commit && !didRepeat) tap();
       didRepeat = false;
     };
@@ -228,11 +226,11 @@ export class BrailleSlider {
     this.barEl.innerHTML = state.glyphs.map((g, i) =>
       `<span style="color:${this.palette[state.colors[i]]}">${g}</span>`
     ).join("");
-    this.valueEl.textContent = this.format(this.value);
     this.barEl.setAttribute("aria-valuenow", String(this.value));
     this.barEl.setAttribute("aria-valuemin", String(this.min));
     this.barEl.setAttribute("aria-valuemax", String(this.max));
     this.barEl.setAttribute("aria-valuetext", this.format(this.value));
+    this.barEl.setAttribute("title", `${this.label} = ${this.format(this.value)}`);
   }
 
   onChange(cb) { this.handlers.push(cb); return this; }

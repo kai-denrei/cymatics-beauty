@@ -6,11 +6,11 @@
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0d0d0f">
 <title>cymatics — v1 (membrane approx)</title>
-<link rel="stylesheet" href="styles.css?v=bc80c1ef">
+<link rel="stylesheet" href="styles.css?v=7ec6917d">
 
 <!-- PWA -->
-<link rel="manifest" href="manifest.webmanifest?v=bc80c1ef">
-<link rel="apple-touch-icon" href="icons/icon.svg?v=bc80c1ef">
+<link rel="manifest" href="manifest.webmanifest?v=7ec6917d">
+<link rel="apple-touch-icon" href="icons/icon.svg?v=7ec6917d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="cymatics">
@@ -18,9 +18,9 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <meta name="cb" content="bc80c1ef">
-  <link rel="icon" type="image/svg+xml" href="./cb-shapes/60.svg?v=bc80c1ef">
-  <script src="./cb-badge.js?v=bc80c1ef" defer></script>
+  <meta name="cb" content="7ec6917d">
+  <link rel="icon" type="image/svg+xml" href="./cb-shapes/62.svg?v=7ec6917d">
+  <script src="./cb-badge.js?v=7ec6917d" defer></script>
 </head>
 <body>
 <main id="stage">
@@ -30,18 +30,25 @@
 
   <aside id="controls">
     <header class="head">
-      <h1>cymatics</h1>
-      <div class="badge-row">
-        <span class="mode-badge" id="mode-badge">MODE: membrane approx</span>
+      <div class="head-left">
+        <span class="title">cymatics</span>
         <button type="button" class="about-btn" id="about-btn"
-                aria-haspopup="dialog" aria-label="about / formulas">+</button>
+                aria-haspopup="dialog" aria-label="about / glossary">+</button>
+      </div>
+      <div class="head-right">
+        <button type="button" id="audio-toggle" class="mute-btn"
+                aria-pressed="false" aria-label="unmute audio">🔇</button>
+        <span class="freq" id="freq">— Hz</span>
       </div>
     </header>
 
-    <section class="bsl-grid">
+    <canvas id="scope" width="540" height="64" aria-hidden="true"></canvas>
+
+    <p class="warn" id="mn-warn" hidden>M ≠ N required — field vanishes when equal.</p>
+
+    <section class="bsl-grid" aria-label="parameters">
       <div id="slot-m"></div>
       <div id="slot-n"></div>
-      <p class="warn bsl-wide" id="mn-warn" hidden>m must differ from n — the field vanishes.</p>
       <div id="slot-temp"></div>
       <div id="slot-speed"></div>
       <div id="slot-count" class="bsl-wide"></div>
@@ -58,21 +65,11 @@
               aria-label="reseed particles">↺</button>
     </section>
 
-    <section class="audio">
-      <header class="audio-head">
-        <span class="audio-title">scope</span>
-        <span class="audio-freq" id="freq">— Hz</span>
-        <button type="button" id="audio-toggle" class="icon-btn icon-btn-text"
-                aria-pressed="false" aria-label="unmute audio">🔇</button>
-      </header>
-      <canvas id="scope" width="276" height="64"></canvas>
-    </section>
-
-    <section class="readout">
+    <section class="readout" aria-label="performance readout">
       <dl>
         <dt>fps</dt><dd id="fps">—</dd>
-        <dt>ms / frame</dt><dd id="frame-ms">—</dd>
-        <dt>particles</dt><dd id="live-count">—</dd>
+        <dt>ms</dt><dd id="frame-ms">—</dd>
+        <dt>n</dt><dd id="live-count">—</dd>
       </dl>
     </section>
   </aside>
@@ -90,20 +87,59 @@
     free-edge plate.</p>
 
     <h3>field</h3>
-    <p class="formula">f(x, y) = cos(nπx/L) · cos(mπy/L) − cos(mπx/L) · cos(nπy/L)</p>
+    <p class="formula">f(x, y) = cos(N&middot;πx/L) · cos(M&middot;πy/L) − cos(M&middot;πx/L) · cos(N&middot;πy/L)</p>
     <p>Nodal set is <code>f = 0</code>; particles flow down the gradient of
-    <code>|f|</code>. <code>m = n</code> yields nothing — guarded.</p>
+    <code>|f|</code>.</p>
 
     <h3>synth tone</h3>
-    <p>Frequency keyed to the mode: <span class="formula">f ∝ √(m² + n²)</span>.
-    This is the v1 cheat frequency, not a real plate eigenfrequency. Default
-    muted; tap the icon in the scope panel to enable.</p>
+    <p>Audio frequency keyed to the mode: <span class="formula">f ∝ √(M² + N²)</span>.
+    This is the v1 cheat frequency, not a real plate eigenfrequency.</p>
 
-    <h3>continuous vs. auto-cycle</h3>
-    <p><strong>∞</strong> swaps to a new <code>(m, n)</code> once particles
-    have <em>settled</em> on the current pattern (an EMA of mean particle
-    speed crosses a threshold). <strong>↻</strong> swaps on a fixed timer.
-    Either can be on; if both are on, settle wins.</p>
+    <h3>controls — glossary</h3>
+    <dl class="glossary">
+      <dt>M, N</dt>
+      <dd>Mode indices, integers 1…12. They set the spatial frequency of the
+      field in x and y; higher values pack more nodal lines onto the plate.
+      Must differ — the field vanishes when M = N.</dd>
+
+      <dt>J — jitter</dt>
+      <dd>Random thermal kick added to each particle every frame (0…1).
+      Higher J makes the cloud wander; lower J makes particles snap to nodes
+      faster but the pattern looks brittle.</dd>
+
+      <dt>S — settle speed</dt>
+      <dd>Multiplier on the gradient force pulling particles toward nodes
+      (0.1…3). Higher = faster settling but more overshoot. 1.0 is a good
+      middle.</dd>
+
+      <dt>P — particles</dt>
+      <dd>Number of grains on the plate (2k…200k). Mobile defaults to 30k to
+      hold 60 fps; desktop to 60k. You can crank it.</dd>
+
+      <dt>⏸ / ▶</dt>
+      <dd>Pause or play the particle integrator. The field itself is not
+      affected — only motion freezes.</dd>
+
+      <dt>∞ — continuous</dt>
+      <dd>Once particles have <em>settled</em> on the current (M, N), pick a
+      fresh random (M, N) and re-energize the cloud. Trigger is an EMA of
+      mean particle speed crossing a threshold, not a clock. Pressing
+      <code>&lt;</code> or <code>&gt;</code> always overrides; the swap clock
+      resets to give your choice ~1.8 s to settle.</dd>
+
+      <dt>↻ — auto-cycle</dt>
+      <dd>Swap (M, N) on a fixed 4-second timer regardless of settle state.
+      If both ∞ and ↻ are on, the settle trigger wins (it's the more
+      physical of the two).</dd>
+
+      <dt>↺ — reseed</dt>
+      <dd>Re-randomize every particle's position. Useful when the cloud has
+      clumped or you want a fresh start without touching the field.</dd>
+
+      <dt>🔇 / 🔊</dt>
+      <dd>Toggle the synth tone. Default muted (browser policy — the
+      <code>AudioContext</code> only spins up on your first unmute click).</dd>
+    </dl>
 
     <h3>physics distinctions kept honest</h3>
     <ul>
@@ -118,6 +154,6 @@
   </div>
 </dialog>
 
-<script type="module" src="src/main.js?v=bc80c1ef"></script>
+<script type="module" src="src/main.js?v=7ec6917d"></script>
 </body>
 </html>

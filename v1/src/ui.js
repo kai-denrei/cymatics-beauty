@@ -1,23 +1,16 @@
 // Wiring for the controls panel. Constructs BrailleSlider instances in place
 // of native <input type=range>, then attaches change handlers that funnel
-// through state.applyMode (for m/n) or update state directly (for count,
-// temp, speed). Icon buttons replace native toggles for pause / continuous /
-// cycle. About dialog opens on the "+" trigger.
+// through state.applyMode (m, n) or update state directly (count, temp,
+// speed). Icon buttons replace native toggles for pause / continuous /
+// cycle / reseed. About dialog opens on the "+" trigger.
 
 import { BrailleSlider } from "./braille-slider.js";
-
-const PALETTE_M     = "amber";
-const PALETTE_N     = "amber";
-const PALETTE_COUNT = "teal";
-const PALETTE_TEMP  = "teal";
-const PALETTE_SPEED = "teal";
 
 export function wireUI(state, opts = {}) {
   const $ = (id) => document.getElementById(id);
 
-  const mnWarn     = $("mn-warn");
-  const badge      = $("mode-badge");
-  const freqOut    = $("freq");
+  const mnWarn  = $("mn-warn");
+  const freqOut = $("freq");
 
   const pauseBtn      = $("pause-btn");
   const continuousBtn = $("continuous-btn");
@@ -35,38 +28,41 @@ export function wireUI(state, opts = {}) {
   const fmt2   = (v) => Number(v).toFixed(2);
 
   // --- Sliders ---------------------------------------------------------------
+  // Single-letter labels match the compact dashboard mock.
   const sliders = {
     m: new BrailleSlider({
       mount: $("slot-m"), min: 1, max: 12, step: 1, value: 3,
-      label: "m", palette: PALETTE_M, format: fmtInt,
+      label: "M", palette: "amber", format: fmtInt,
     }),
     n: new BrailleSlider({
       mount: $("slot-n"), min: 1, max: 12, step: 1, value: 5,
-      label: "n", palette: PALETTE_N, format: fmtInt,
+      label: "N", palette: "amber", format: fmtInt,
+    }),
+    temp: new BrailleSlider({
+      mount: $("slot-temp"), min: 0, max: 1, step: 0.01, value: 0.5,
+      label: "J", palette: "amber", format: fmt2,
+    }),
+    speed: new BrailleSlider({
+      mount: $("slot-speed"), min: 0.1, max: 3, step: 0.05, value: 1,
+      label: "S", palette: "amber", format: fmt2,
     }),
     count: new BrailleSlider({
       mount: $("slot-count"), min: 2000, max: 200000, step: 2000,
       value: defaultCount,
-      label: "particles", palette: PALETTE_COUNT, format: fmtInt,
-    }),
-    temp: new BrailleSlider({
-      mount: $("slot-temp"), min: 0, max: 1, step: 0.01, value: 0.5,
-      label: "jitter", palette: PALETTE_TEMP, format: fmt2,
-    }),
-    speed: new BrailleSlider({
-      mount: $("slot-speed"), min: 0.1, max: 3, step: 0.05, value: 1,
-      label: "speed", palette: PALETTE_SPEED, format: fmt2,
+      label: "P", palette: "teal", format: fmtInt,
     }),
   };
   state.sliders = sliders;
 
   // --- Mode application (m/n shared path) ------------------------------------
+  // applyMode is also called by main.js triggerSwap() for programmatic swaps,
+  // and by manual user clicks via the slider onChange handlers below. Both
+  // paths land here so the side effects (mn-warn, requestMode) fire once.
   state.applyMode = (m, n) => {
     state.m = m;
     state.n = n;
     const collide = m === n;
     mnWarn.hidden = !collide;
-    badge.textContent = `MODE: m=${m}, n=${n}`;
     if (!collide) state.onModeChange?.(m, n);
   };
 
@@ -103,9 +99,8 @@ export function wireUI(state, opts = {}) {
 
   reseedBtn.addEventListener("click", () => {
     state.reseedRequested = true;
-    // Quick visual pulse.
     reseedBtn.classList.add("pulse");
-    setTimeout(() => reseedBtn.classList.remove("pulse"), 250);
+    setTimeout(() => reseedBtn.classList.remove("pulse"), 240);
   });
 
   // --- Audio -----------------------------------------------------------------
@@ -123,7 +118,7 @@ export function wireUI(state, opts = {}) {
   // --- About dialog ----------------------------------------------------------
   if (aboutBtn && aboutDialog) {
     const openDlg  = () => { try { aboutDialog.showModal(); } catch { aboutDialog.setAttribute("open", ""); } };
-    const closeDlg = () => { try { aboutDialog.close(); } catch { aboutDialog.removeAttribute("open"); } };
+    const closeDlg = () => { try { aboutDialog.close();      } catch { aboutDialog.removeAttribute("open"); } };
     aboutBtn.addEventListener("click", openDlg);
     aboutClose?.addEventListener("click", closeDlg);
     // Backdrop click closes the dialog.
@@ -142,6 +137,5 @@ export function wireUI(state, opts = {}) {
   state.continuous  = false;
   state.paused      = false;
   state.audioMuted  = true;
-
-  badge.textContent = `MODE: m=${state.m}, n=${state.n}`;
+  mnWarn.hidden = (state.m !== state.n);
 }

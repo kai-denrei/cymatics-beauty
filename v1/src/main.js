@@ -92,9 +92,13 @@ function requestMode(m, n) {
   const hz = modeFrequency(m, n);
   audio.setFrequency(hz);
   state.setFrequencyDisplay?.(hz);
-  lastSwapAt = performance.now();
-  settleEMA = 1;  // reset EMA so we don't immediately retrigger
-  tempPulse = 1;  // kick the particles so they break free of the old basin
+  // Reset BOTH swap clocks so a manual <,> press always gets the full dwell
+  // window before continuous (settle) or auto-cycle (timer) overrides.
+  const now = performance.now();
+  lastSwapAt   = now;
+  autoLastSwap = now;
+  settleEMA = 1;
+  tempPulse = 1;
 }
 
 state.onModeChange = requestMode;
@@ -145,10 +149,10 @@ function frame(now) {
   if (particles.count !== state.count) particles.resize(state.count);
 
   // Continuous (settle-detected) takes priority over time-based auto-cycle
-  // when both are on — settle is the more physical trigger.
-  if (state.continuous && !pendingMode && (now - lastSwapAt) > MIN_DWELL_MS) {
-    // Sample mean speed every ~6 frames and feed an EMA. The EMA is what we
-    // compare against the threshold so a single low-speed frame doesn't trip it.
+  // when both are on — settle is the more physical trigger. Both are skipped
+  // while paused (no particle motion → settle would fire instantly, and
+  // timer-cycling a frozen plate makes no sense).
+  if (!state.paused && state.continuous && !pendingMode && (now - lastSwapAt) > MIN_DWELL_MS) {
     settleSampleCounter++;
     if (settleSampleCounter >= 6) {
       settleSampleCounter = 0;
@@ -158,7 +162,7 @@ function frame(now) {
     if (settleEMA < SETTLE_THRESHOLD) {
       triggerSwap();
     }
-  } else if (state.autoCycle && now - autoLastSwap > 4000 && !pendingMode) {
+  } else if (!state.paused && state.autoCycle && now - autoLastSwap > 4000 && !pendingMode) {
     triggerSwap();
     autoLastSwap = now;
   }
