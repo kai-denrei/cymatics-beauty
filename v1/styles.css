@@ -139,6 +139,20 @@ body {
   100% { transform: scale(1); }
 }
 
+/* Studio-detected hint — pulses on ⌁ when a broadcast is arriving but
+   LIVE is still off. Only the visual; the receiver stays inert. */
+.icon-btn.detect {
+  border-color: var(--teal);
+  color: var(--teal);
+  animation: detect-pulse 1.2s ease-in-out infinite;
+}
+.icon-btn.detect[aria-pressed="true"] { animation: none; }
+
+@keyframes detect-pulse {
+  0%, 100% { box-shadow: 0 0 0 0   rgba(63, 182, 168, 0.00); }
+  50%      { box-shadow: 0 0 0 4px rgba(63, 182, 168, 0.28); }
+}
+
 .audio-mute {
   background: transparent;
   border: 1px solid var(--rule);

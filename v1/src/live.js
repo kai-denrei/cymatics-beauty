@@ -17,12 +17,18 @@ export function setupLive(state, audio, opts = {}) {
   const ch = new BroadcastChannel(CHAN);
   let active = false;
   let lastM = null, lastN = null;
+  let lastBroadcastAt = 0;            // when we last saw any 'cymatics' msg
   const listeners = new Set();
 
   ch.onmessage = (e) => {
-    if (!active) return;
     const d = e.data;
     if (!d || d.type !== 'cymatics') return;
+
+    // Always update the broadcast-fresh timestamp so the ⌁ button can light
+    // up as a discoverability hint while LIVE is off. The actual field
+    // mutation below is gated on `active`.
+    lastBroadcastAt = performance.now();
+    if (!active) return;
 
     let { M, N, J, S } = d;
     if (M === N) N = N < 12 ? N + 1 : N - 1;   // defensive — never equal
@@ -59,5 +65,14 @@ export function setupLive(state, audio, opts = {}) {
   }
   function onChange(fn) { listeners.add(fn); return () => listeners.delete(fn); }
 
-  return { setActive, onChange, get active() { return active; }, channel: CHAN };
+  function isBroadcastFresh(windowMs = 500) {
+    return (performance.now() - lastBroadcastAt) < windowMs;
+  }
+
+  return {
+    setActive, onChange,
+    get active() { return active; },
+    channel: CHAN,
+    isBroadcastFresh,
+  };
 }

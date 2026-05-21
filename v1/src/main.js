@@ -2,10 +2,10 @@
 // particle integrator + ImageData renderer. Also owns the audio synth and the
 // settlement-detected "continuous play" loop.
 
-import { Particles }                from "./particles.js?v=a9090546";
-import { wireUI }                   from "./ui.js?v=a9090546";
-import { AudioEngine, drawScope, modeFrequency } from "./audio.js?v=a9090546";
-import { setupLive }                from "./live.js?v=a9090546";
+import { Particles }                from "./particles.js?v=855c0709";
+import { wireUI }                   from "./ui.js?v=855c0709";
+import { AudioEngine, drawScope, modeFrequency } from "./audio.js?v=855c0709";
+import { setupLive }                from "./live.js?v=855c0709";
 
 const MAX_PARTICLES = 200000;
 
@@ -63,7 +63,7 @@ particles.resize(state.count);
 let field = null;
 let pendingMode = null;
 
-const worker = new Worker(new URL("./worker.js?v=a9090546", import.meta.url), { type: "module" });
+const worker = new Worker(new URL("./worker.js?v=855c0709", import.meta.url), { type: "module" });
 worker.onmessage = (e) => {
   const msg = e.data;
   if (msg.type === "field") {
@@ -120,13 +120,32 @@ if (studioLink) {
 
 // ImageData byte order is R,G,B,A. On little-endian (every browser target here),
 // a Uint32 view reads as 0xAABBGGRR, so the literal puts A in the high byte.
-// 0xFF 0A 0A 0C → A=255, B=10, G=10, R=12 → near-black background.
-// 0xFF FF FF FF → A=255, B=255, G=255, R=255 → white particles.
-const BG = 0xFF0A0A0C;
-const PT = 0xFFFFFFFF;
+// 0xFF A3 B3 5F → A=255, B=163, G=179, R=95 → teal rgb(95,179,163).
+// Matches the studio preview canvas's particle color so the LIVE view looks
+// like a magnified version of the same visualization.
+const PT = 0xFFA3B35F;
 
-function clearTo(color) {
-  pixels.fill(color);
+// Per-frame fade factor (out of 256). 200/256 ≈ 0.78 — leaves visible trails
+// that decay over ~5–8 frames (~100ms). Studio uses `rgba(8,10,10,0.30)` overlay
+// which is the same idea: keep ~70% of the previous frame, paint the new on top.
+const FADE_NUM = 200;
+
+// Initialize alpha channel to 255 once (createImageData ships with all bytes 0;
+// without this the first putImageData would render fully transparent).
+{
+  const u8 = img.data;
+  for (let i = 3; i < u8.length; i += 4) u8[i] = 0xFF;
+}
+
+function fadeFrame() {
+  const u8 = img.data;
+  const len = u8.length;
+  for (let i = 0; i < len; i += 4) {
+    u8[i]     = (u8[i]     * FADE_NUM) >> 8;   // R
+    u8[i + 1] = (u8[i + 1] * FADE_NUM) >> 8;   // G
+    u8[i + 2] = (u8[i + 2] * FADE_NUM) >> 8;   // B
+    // alpha stays 255
+  }
 }
 
 function randomMode(currentM, currentN) {
@@ -189,7 +208,7 @@ function frame(now) {
   if (!state.paused) particles.step(field, dt, effectiveTemp, state.speed);
 
   // Render.
-  clearTo(BG);
+  fadeFrame();
   const w = INTERNAL_W, h = INTERNAL_H;
   const pos = particles.pos;
   const n = particles.count;

@@ -4,7 +4,7 @@
 // speed). Icon buttons replace native toggles for pause / continuous /
 // cycle / reseed. About dialog opens on the "+" trigger.
 
-import { BrailleSlider } from "./braille-slider.js?v=a9090546";
+import { BrailleSlider } from "./braille-slider.js?v=855c0709";
 
 export function wireUI(state, opts = {}) {
   const $ = (id) => document.getElementById(id);
@@ -161,7 +161,19 @@ export function wireUI(state, opts = {}) {
     live.onChange((on) => {
       continuousBtn.disabled = on;
       cycleBtn.disabled = on;
+      if (on) liveBtn.classList.remove("detect");
     });
+
+    // Discoverability hint: while LIVE is OFF but the studio is broadcasting,
+    // pulse the ⌁ button so the user knows there's something to bind. The
+    // receiver itself stays silent in this mode — clicking the button is the
+    // only thing that actually applies the stream. Per STUDIO_INTEGRATION.md
+    // §5: "live OFF: ignore the channel entirely" remains intact (we only
+    // observe the timestamp, not the payload).
+    setInterval(() => {
+      const should = !live.active && live.isBroadcastFresh();
+      liveBtn.classList.toggle("detect", should);
+    }, 250);
   }
 
   // --- Audio -----------------------------------------------------------------
