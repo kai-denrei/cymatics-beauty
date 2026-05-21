@@ -1,4 +1,6 @@
-/* cymatics v1 — editorial dark, mono numbers, amber/teal accents. */
+/* cymatics v1 — editorial dark, mono numbers, amber/teal accents.
+   Layout adapts between portrait (canvas top, controls scroll below) and
+   landscape ≥720px (canvas left, controls right at 340px). */
 
 :root {
   --bg: #0d0d0f;
@@ -12,9 +14,11 @@
 
   --serif: "Iowan Old Style", "Apple Garamond", "Georgia", "EB Garamond", "Cambria", serif;
   --mono: "JetBrains Mono", "SF Mono", "Menlo", "DejaVu Sans Mono", "Consolas", monospace;
+
+  --tap-min: 44px;
 }
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 html, body {
   margin: 0;
@@ -24,43 +28,61 @@ html, body {
   font-family: var(--serif);
   font-size: 15px;
   line-height: 1.45;
-  height: 100%;
+  min-height: 100%;
+  overscroll-behavior: contain;
+}
+
+body {
+  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 
+/* ── Portrait / compact (default) ──────────────────────────────────────── */
 #stage {
   display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 0;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
   height: 100vh;
+  height: 100dvh;
   width: 100vw;
+}
+
+#plate-wrap {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 #plate {
   display: block;
   width: 100%;
   height: 100%;
-  background: #000;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
 
 #controls {
   background: var(--bg-elev);
-  border-left: 1px solid var(--rule);
-  padding: 24px 22px;
+  border-top: 1px solid var(--rule);
+  padding: 16px 18px max(20px, env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 #controls header h1 {
   font-family: var(--serif);
   font-weight: 400;
-  font-size: 28px;
+  font-size: 24px;
   letter-spacing: 0.02em;
-  margin: 0 0 6px 0;
+  margin: 0 0 4px 0;
   color: var(--ink);
 }
 
@@ -90,56 +112,120 @@ html, body {
   line-height: 1.3;
 }
 
-.control {
+/* ── Braille slider ───────────────────────────────────────────────────── */
+.bsl {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
+.bsl-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.bsl-value {
+  font-size: 14px;
+  color: var(--teal);
+  text-transform: none;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.bsl-row {
+  display: grid;
+  grid-template-columns: var(--tap-min) 1fr var(--tap-min);
+  gap: 8px;
+  align-items: stretch;
+}
+
+.bsl-btn {
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--ink-dim);
+  font-family: var(--mono);
+  font-size: 22px;
+  line-height: 1;
+  min-height: var(--tap-min);
+  min-width: var(--tap-min);
+  padding: 0;
+  cursor: pointer;
+  border-radius: 1px;
+  transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+  touch-action: manipulation;
+}
+
+.bsl-btn:hover,
+.bsl-btn:active {
+  border-color: var(--amber);
+  color: var(--amber);
+  background: rgba(217, 164, 65, 0.06);
+}
+
+.bsl-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  font-family: var(--mono);
+  font-size: 28px;
+  line-height: 1;
+  min-height: var(--tap-min);
+  border: 1px solid var(--rule);
+  border-radius: 1px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  outline: none;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.bsl-bar:focus-visible {
+  border-color: var(--teal);
+}
+
+.bsl-bar span {
+  display: inline-block;
+  padding: 0 1px;
+}
+
+/* ── Toggle row ───────────────────────────────────────────────────────── */
 .control.row {
+  display: flex;
   flex-direction: row;
   align-items: center;
   gap: 14px;
   flex-wrap: wrap;
 }
 
-.control label {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-dim);
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-}
-
-.control label output {
-  font-family: var(--mono);
-  font-size: 13px;
-  color: var(--teal);
-  text-transform: none;
-  letter-spacing: 0;
-}
-
-.control input[type="range"] {
-  width: 100%;
-  accent-color: var(--amber);
-  background: transparent;
-}
-
 .toggle {
-  display: inline-flex !important;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  flex-direction: row !important;
-  justify-content: flex-start !important;
+  font-family: var(--mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+  min-height: var(--tap-min);
 }
 
-.toggle input { accent-color: var(--teal); }
+.toggle input {
+  accent-color: var(--teal);
+  width: 18px;
+  height: 18px;
+}
 
-button {
+button#reseed,
+.audio-btn {
   background: transparent;
   color: var(--ink);
   border: 1px solid var(--rule);
@@ -147,13 +233,15 @@ button {
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 6px 12px;
+  padding: 8px 14px;
+  min-height: var(--tap-min);
   cursor: pointer;
   border-radius: 1px;
   transition: border-color 120ms ease, color 120ms ease;
 }
 
-button:hover {
+button#reseed:hover,
+.audio-btn:hover {
   border-color: var(--teal);
   color: var(--teal);
 }
@@ -162,9 +250,10 @@ button:hover {
   font-family: var(--mono);
   font-size: 11px;
   color: var(--warn);
-  margin: 4px 0 0 0;
+  margin: -6px 0 0 0;
 }
 
+/* ── Readout dl ───────────────────────────────────────────────────────── */
 .readout {
   border-top: 1px solid var(--rule);
   padding-top: 14px;
@@ -196,17 +285,19 @@ button:hover {
 #controls footer {
   margin-top: auto;
   border-top: 1px solid var(--rule);
-  padding-top: 14px;
+  padding-top: 12px;
 }
 
 .ref {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 10px;
   color: var(--ink-dim);
   margin: 0;
   line-height: 1.6;
+  word-break: break-word;
 }
 
+/* ── Audio panel + scope canvas ───────────────────────────────────────── */
 .audio {
   border-top: 1px solid var(--rule);
   padding-top: 14px;
@@ -218,7 +309,7 @@ button:hover {
 .audio-head {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  align-items: baseline;
+  align-items: center;
   gap: 10px;
 }
 
@@ -236,11 +327,6 @@ button:hover {
   color: var(--teal);
   font-variant-numeric: tabular-nums;
   text-align: right;
-}
-
-.audio-btn {
-  font-size: 10px;
-  padding: 3px 8px;
 }
 
 .audio-btn[aria-pressed="true"] {
@@ -263,4 +349,43 @@ button:hover {
   color: var(--ink-dim);
   line-height: 1.4;
   margin: 0;
+}
+
+/* ── Wide / desktop / landscape ≥ 720px ───────────────────────────────── */
+@media (min-width: 720px) {
+  #stage {
+    grid-template-columns: 1fr 340px;
+    grid-template-rows: 1fr;
+  }
+
+  #plate-wrap {
+    aspect-ratio: auto;
+    height: 100%;
+  }
+
+  #plate {
+    width: auto;
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    max-width: 100%;
+  }
+
+  #controls {
+    border-top: 0;
+    border-left: 1px solid var(--rule);
+    padding: 22px 22px max(22px, env(safe-area-inset-bottom));
+    gap: 16px;
+  }
+
+  #controls header h1 {
+    font-size: 28px;
+  }
+
+  .bsl-bar { font-size: 30px; }
+}
+
+/* ── Cache-bust badge (third-party widget) safe-area dodge ─────────────── */
+#cb-badge {
+  bottom: max(8px, env(safe-area-inset-bottom)) !important;
+  right:  max(8px, env(safe-area-inset-right))  !important;
 }

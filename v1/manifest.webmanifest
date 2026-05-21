@@ -1,0 +1,19 @@
+{
+  "name": "cymatics",
+  "short_name": "cymatics",
+  "description": "Interactive cymatics — v1 membrane-approx toy field.",
+  "start_url": "./?src=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0d0d0f",
+  "theme_color": "#0d0d0f",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

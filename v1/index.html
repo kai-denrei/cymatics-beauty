@@ -2,55 +2,48 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0d0d0f">
 <title>cymatics — v1 (membrane approx)</title>
-<link rel="stylesheet" href="styles.css?v=0840320a">
+<link rel="stylesheet" href="styles.css?v=6fb15131">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.webmanifest?v=6fb15131">
+<link rel="apple-touch-icon" href="icons/icon.svg?v=6fb15131">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="cymatics">
+
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <meta name="cb" content="0840320a">
-  <link rel="icon" type="image/svg+xml" href="./cb-shapes/08.svg?v=0840320a">
-  <script src="./cb-badge.js?v=0840320a" defer></script>
+  <meta name="cb" content="6fb15131">
+  <link rel="icon" type="image/svg+xml" href="./cb-shapes/47.svg?v=6fb15131">
+  <script src="./cb-badge.js?v=6fb15131" defer></script>
 </head>
 <body>
 <main id="stage">
-  <canvas id="plate" width="640" height="640"></canvas>
+  <div id="plate-wrap">
+    <canvas id="plate" width="540" height="540"></canvas>
+  </div>
 
   <aside id="controls">
     <header>
       <h1>cymatics</h1>
       <p class="caveat">
         <span class="mode-badge" id="mode-badge">MODE: membrane approx (m,n)</span>
-        <span class="hint">this is the v1 toy field — the membrane/Helmholtz superposition, not the Kirchhoff plate. v2 replaces this.</span>
+        <span class="hint">v1 toy field — the membrane/Helmholtz superposition, not the Kirchhoff plate. v2 replaces this.</span>
       </p>
     </header>
 
-    <section class="control">
-      <label for="m">m <output for="m" id="m-out">3</output></label>
-      <input type="range" id="m" min="1" max="12" value="3" step="1">
-    </section>
+    <section class="braille-slider" id="slot-m"   data-key="m"></section>
+    <section class="braille-slider" id="slot-n"   data-key="n"></section>
+    <p class="warn" id="mn-warn" hidden>m must differ from n — the field vanishes identically.</p>
 
-    <section class="control">
-      <label for="n">n <output for="n" id="n-out">5</output></label>
-      <input type="range" id="n" min="1" max="12" value="5" step="1">
-      <p class="warn" id="mn-warn" hidden>m must differ from n — the field vanishes identically.</p>
-    </section>
-
-    <section class="control">
-      <label for="count">particles <output for="count" id="count-out">60000</output></label>
-      <input type="range" id="count" min="2000" max="200000" value="60000" step="2000">
-    </section>
-
-    <section class="control">
-      <label for="temp">jitter <output for="temp" id="temp-out">0.50</output></label>
-      <input type="range" id="temp" min="0" max="1" value="0.5" step="0.01">
-    </section>
-
-    <section class="control">
-      <label for="speed">settle speed <output for="speed" id="speed-out">1.00</output></label>
-      <input type="range" id="speed" min="0.1" max="3" value="1" step="0.05">
-    </section>
+    <section class="braille-slider" id="slot-count" data-key="count"></section>
+    <section class="braille-slider" id="slot-temp"  data-key="temp"></section>
+    <section class="braille-slider" id="slot-speed" data-key="speed"></section>
 
     <section class="control row">
       <label class="toggle"><input type="checkbox" id="continuous"> continuous</label>
@@ -86,6 +79,6 @@
   </aside>
 </main>
 
-<script type="module" src="src/main.js?v=0840320a"></script>
+<script type="module" src="src/main.js?v=6fb15131"></script>
 </body>
 </html>

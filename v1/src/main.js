@@ -7,8 +7,16 @@ import { wireUI }                   from "./ui.js";
 import { AudioEngine, drawScope, modeFrequency } from "./audio.js";
 
 const MAX_PARTICLES = 200000;
-const INTERNAL_W    = 540;
-const INTERNAL_H    = 540;
+
+// Adaptive internal resolution + default count. On small / coarse-pointer
+// devices we drop the render surface and the default particle count so the
+// frame loop holds 60fps even on mid-tier mobile GPUs. The user can still
+// crank the count up via the slider — this only sets the *default*.
+const isCompact =
+  window.matchMedia("(max-width: 720px), (pointer: coarse)").matches;
+const INTERNAL_W = isCompact ? 360 : 540;
+const INTERNAL_H = INTERNAL_W;
+const DEFAULT_COUNT = isCompact ? 30000 : 60000;
 
 // Continuous-play tuning.
 const SETTLE_THRESHOLD = 0.006;   // EMA mean |v| under which we consider it "settled"
@@ -17,7 +25,7 @@ const PULSE_DECAY      = 0.965;   // per-frame multiplicative decay of the kick
 
 const state = {
   m: 3, n: 5,
-  count: 60000,
+  count: DEFAULT_COUNT,
   temperature: 0.5,
   speed: 1,
   autoCycle: false,
@@ -28,6 +36,8 @@ const state = {
   onModeChange: null,
   onAudioToggle: null,
   setFrequencyDisplay: null,
+  applyMode: null,   // installed by wireUI
+  sliders: null,     // installed by wireUI
 };
 
 const canvas = document.getElementById("plate");
@@ -90,7 +100,7 @@ function requestMode(m, n) {
 state.onModeChange = requestMode;
 state.onAudioToggle = (muted) => { audio.setMuted(muted); };
 
-wireUI(state);
+wireUI(state, { defaultCount: DEFAULT_COUNT });
 requestMode(state.m, state.n);
 
 // ImageData byte order is R,G,B,A. On little-endian (every browser target here),
@@ -116,13 +126,11 @@ function randomMode(currentM, currentN) {
 
 function triggerSwap() {
   const next = randomMode(state.m, state.n);
-  const mEl = document.getElementById("m");
-  const nEl = document.getElementById("n");
-  mEl.value = next.m;
-  nEl.value = next.n;
-  // Single dispatch — refreshMN reads both slider values, computes the new
-  // mode, updates the badge, and calls onModeChange exactly once.
-  mEl.dispatchEvent(new Event("input"));
+  // Update slider visuals silently, then commit once via applyMode so the
+  // mode-changed callback fires exactly once with the new (m, n).
+  state.sliders.m.setValue(next.m, { silent: true });
+  state.sliders.n.setValue(next.n, { silent: true });
+  state.applyMode(next.m, next.n);
 }
 
 function frame(now) {
