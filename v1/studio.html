@@ -396,7 +396,13 @@ function mapToField(ft){
   const reseed=ft.beat && (beatCount%4===0);
   return {M,N,J:clamp(jit,0,1),S,reseed};
 }
+// `track` carries the current preset's human label (e.g. "Chaconne — D-minor
+// techno") so the cymatics tab can display what's playing. It's a string-only
+// extension to the contract in STUDIO_INTEGRATION.md §2 — receivers that don't
+// know about it just ignore the field.
+let currentTrackLabel = '';
 function broadcast(m,ft){ chan.postMessage({ type:'cymatics', t:performance.now(),
+  track:currentTrackLabel,
   M:m.M,N:m.N,J:+m.J.toFixed(3),S:+m.S.toFixed(3), beat:ft.beat, reseed:m.reseed,
   rms:+ft.rms.toFixed(3), bass:+ft.bass.toFixed(3), mid:+ft.mid.toFixed(3),
   treble:+ft.tre.toFixed(3), centroid:+ft.cen01.toFixed(3) }); }
@@ -700,6 +706,7 @@ function applyAll(){
 function loadPreset(key){
   const p = PRESETS[key];
   if(!p) return;
+  currentTrackLabel = p.label;
   $('bpm').value = p.bpm;
   $('code').value = p.palette;
   $('arr').value = p.arrangement;

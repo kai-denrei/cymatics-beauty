@@ -4,7 +4,7 @@
 // speed). Icon buttons replace native toggles for pause / continuous /
 // cycle / reseed. About dialog opens on the "+" trigger.
 
-import { BrailleSlider } from "./braille-slider.js?v=bde1b86f";
+import { BrailleSlider } from "./braille-slider.js?v=43bda37c";
 
 export function wireUI(state, opts = {}) {
   const $ = (id) => document.getElementById(id);
@@ -164,15 +164,22 @@ export function wireUI(state, opts = {}) {
       if (on) liveBtn.classList.remove("detect");
     });
 
-    // Discoverability hint: while LIVE is OFF but the studio is broadcasting,
-    // pulse the ⌁ button so the user knows there's something to bind. The
-    // receiver itself stays silent in this mode — clicking the button is the
-    // only thing that actually applies the stream. Per STUDIO_INTEGRATION.md
-    // §5: "live OFF: ignore the channel entirely" remains intact (we only
-    // observe the timestamp, not the payload).
+    // Discoverability hint + now-playing label. While LIVE is OFF but the
+    // studio is broadcasting, the ⌁ button pulses. The label below the
+    // iconbar shows the currently-loaded preset name; both surfaces become
+    // dim when no broadcast has arrived in the last 500ms. Per
+    // STUDIO_INTEGRATION.md §5: "live OFF: ignore the channel entirely"
+    // remains intact (we only observe the timestamp + label string).
+    const nowPlayingEl = $("now-playing");
+    if (nowPlayingEl) {
+      live.onTrack((label) => {
+        nowPlayingEl.textContent = label || "—";
+      });
+    }
     setInterval(() => {
-      const should = !live.active && live.isBroadcastFresh();
-      liveBtn.classList.toggle("detect", should);
+      const fresh = live.isBroadcastFresh();
+      liveBtn.classList.toggle("detect", !live.active && fresh);
+      if (nowPlayingEl) nowPlayingEl.classList.toggle("dim", !fresh);
     }, 250);
   }
 

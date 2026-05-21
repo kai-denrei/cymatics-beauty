@@ -187,6 +187,28 @@ body {
   text-align: right;
 }
 
+/* ── Now-playing label (between iconbar and scope) ─────────────────────── */
+.now-playing {
+  margin: -2px 0 0;
+  padding: 0 2px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--teal);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+  transition: opacity 200ms ease, color 200ms ease;
+}
+
+.now-playing.dim {
+  color: var(--ink-dim);
+  opacity: 0.35;
+}
+
 /* ── Scope ─────────────────────────────────────────────────────────────── */
 #scope {
   display: block;

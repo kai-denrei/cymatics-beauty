@@ -18,7 +18,9 @@ export function setupLive(state, audio, opts = {}) {
   let active = false;
   let lastM = null, lastN = null;
   let lastBroadcastAt = 0;            // when we last saw any 'cymatics' msg
+  let lastTrackLabel = '';            // optional preset-label string from studio
   const listeners = new Set();
+  const trackListeners = new Set();
 
   ch.onmessage = (e) => {
     const d = e.data;
@@ -28,6 +30,15 @@ export function setupLive(state, audio, opts = {}) {
     // up as a discoverability hint while LIVE is off. The actual field
     // mutation below is gated on `active`.
     lastBroadcastAt = performance.now();
+
+    // Optional `track` field carries the current preset's human label. It
+    // fires listeners regardless of LIVE state — the now-playing display
+    // is useful even before the user opts into LIVE mode.
+    if (typeof d.track === 'string' && d.track !== lastTrackLabel) {
+      lastTrackLabel = d.track;
+      for (const fn of trackListeners) fn(d.track);
+    }
+
     if (!active) return;
 
     let { M, N, J, S } = d;
@@ -64,14 +75,16 @@ export function setupLive(state, audio, opts = {}) {
     for (const fn of listeners) fn(on);
   }
   function onChange(fn) { listeners.add(fn); return () => listeners.delete(fn); }
+  function onTrack(fn)  { trackListeners.add(fn); return () => trackListeners.delete(fn); }
 
   function isBroadcastFresh(windowMs = 500) {
     return (performance.now() - lastBroadcastAt) < windowMs;
   }
 
   return {
-    setActive, onChange,
+    setActive, onChange, onTrack,
     get active() { return active; },
+    get track() { return lastTrackLabel; },
     channel: CHAN,
     isBroadcastFresh,
   };
