@@ -2,9 +2,9 @@
 // particle integrator + ImageData renderer. Also owns the audio synth and the
 // settlement-detected "continuous play" loop.
 
-import { Particles }                from "./particles.js?v=aa9c8b45";
-import { wireUI }                   from "./ui.js?v=aa9c8b45";
-import { AudioEngine, drawScope, modeFrequency } from "./audio.js?v=aa9c8b45";
+import { Particles }                from "./particles.js?v=bf1d1e72";
+import { wireUI }                   from "./ui.js?v=bf1d1e72";
+import { AudioEngine, drawScope, modeFrequency } from "./audio.js?v=bf1d1e72";
 
 const MAX_PARTICLES = 200000;
 
@@ -21,6 +21,9 @@ const DEFAULT_COUNT = isCompact ? 30000 : 60000;
 // Continuous-play tuning.
 const SETTLE_THRESHOLD = 0.006;   // EMA mean |v| under which we consider it "settled"
 const MIN_DWELL_MS     = 1800;    // minimum time on a mode before continuous can swap
+const MAX_DWELL_MS     = 6000;    // hard ceiling — swap even if EMA never crosses the
+                                  // threshold. Some (M, N) at high S keep particles
+                                  // orbiting nodes forever and would otherwise stick.
 const PULSE_DECAY      = 0.965;   // per-frame multiplicative decay of the kick
 
 const state = {
@@ -55,7 +58,7 @@ particles.resize(state.count);
 let field = null;
 let pendingMode = null;
 
-const worker = new Worker(new URL("./worker.js?v=aa9c8b45", import.meta.url), { type: "module" });
+const worker = new Worker(new URL("./worker.js?v=bf1d1e72", import.meta.url), { type: "module" });
 worker.onmessage = (e) => {
   const msg = e.data;
   if (msg.type === "field") {
@@ -154,7 +157,8 @@ function frame(now) {
       const s = particles.meanSpeedSample(200);
       settleEMA = settleEMA * 0.82 + s * 0.18;
     }
-    if (settleEMA < SETTLE_THRESHOLD) {
+    const dwell = now - lastSwapAt;
+    if (settleEMA < SETTLE_THRESHOLD || dwell > MAX_DWELL_MS) {
       triggerSwap();
     }
   } else if (!state.paused && state.autoCycle && now - autoLastSwap > 4000 && !pendingMode) {
