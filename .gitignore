@@ -1,0 +1,24 @@
+# macOS
+.DS_Store
+
+# v2 outputs
+fem/out/
+fem/venv/
+fem/__pycache__/
+**/__pycache__/
+*.pyc
+
+# v3 audio cache — never commit downloaded audio (see Phase 3 caveats)
+v3/audio_cache/
+v3/*.wav
+v3/*.mp3
+v3/*.m4a
+
+# cache-busting helper deps (if any)
+node_modules/
+tools/cache-busting/node_modules/
+
+# editor noise
+.vscode/
+.idea/
+*.swp
