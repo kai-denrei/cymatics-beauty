@@ -71,13 +71,6 @@ const scopeCtx = scopeCanvas.getContext("2d");
 
 // Frame timing + continuous-play bookkeeping. Declared before `requestMode`
 // because `requestMode` writes to them — TDZ otherwise.
-const fpsEl  = document.getElementById("fps");
-const msEl   = document.getElementById("frame-ms");
-const liveEl = document.getElementById("live-count");
-
-let fpsAccum = 0;
-let fpsFrames = 0;
-let fpsLastReport = performance.now();
 let lastT = performance.now();
 let autoLastSwap = performance.now();
 let lastSwapAt = performance.now();
@@ -130,8 +123,10 @@ function randomMode(currentM, currentN) {
 
 function triggerSwap() {
   const next = randomMode(state.m, state.n);
-  // Update slider visuals silently, then commit once via applyMode so the
-  // mode-changed callback fires exactly once with the new (m, n).
+  // Reseed FIRST so the cloud is uniformly scattered before the new field
+  // pulls it into shape. This amplifies the visual transition — without it,
+  // particles drift smoothly between modes and the change is muted.
+  particles.reseed();
   state.sliders.m.setValue(next.m, { silent: true });
   state.sliders.n.setValue(next.n, { silent: true });
   state.applyMode(next.m, next.n);
@@ -190,19 +185,6 @@ function frame(now) {
 
   // Scope.
   drawScope(scopeCtx, audio, scopeCanvas.width, scopeCanvas.height);
-
-  // Stats.
-  fpsAccum += dt;
-  fpsFrames++;
-  if (now - fpsLastReport > 500) {
-    const fps = fpsFrames / fpsAccum;
-    fpsEl.textContent = fps.toFixed(0);
-    msEl.textContent = (1000 / fps).toFixed(1);
-    liveEl.textContent = n.toLocaleString();
-    fpsAccum = 0;
-    fpsFrames = 0;
-    fpsLastReport = now;
-  }
 
   requestAnimationFrame(frame);
 }

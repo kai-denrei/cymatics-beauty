@@ -113,50 +113,54 @@ export class BrailleSlider {
     this.barEl.addEventListener("keydown",     (e) => this._onKey(e));
   }
 
-  // Single-handler implementation: pointerup fires the step (works for both
-  // mouse and touch with no synthesized-click ambiguity), keydown handles
-  // keyboard activation, and a 450ms hold engages auto-repeat.
+  // Belt-and-braces tap handling. Earlier attempts using only click or only
+  // pointerup were unreliable on iOS: pointerleave fires on the tiniest
+  // finger drift and was cancelling the tap, and bare click suffers the
+  // touch-to-click delay + the page's scroll-priority heuristics. Now:
+  //   - touchend with preventDefault fires step on touch (suppresses the
+  //     synthesized click so it can't double-fire)
+  //   - click handles mouse + keyboard
+  //   - pointerdown + setTimeout handles long-press auto-repeat
+  // didRepeat suppresses the single-tap path when long-press already advanced.
   _wireButton(btn, dir) {
     let holdT, repeatT;
     let didRepeat = false;
-    let armed = false;
 
     const tap = () => this.step(dir);
 
+    // ── Touch path ─────────────────────────────────────────────────────────
+    btn.addEventListener("touchend", (e) => {
+      e.preventDefault();
+      if (didRepeat) { didRepeat = false; return; }
+      tap();
+    }, { passive: false });
+
+    // ── Mouse + keyboard path ─────────────────────────────────────────────
+    btn.addEventListener("click", () => {
+      if (didRepeat) { didRepeat = false; return; }
+      tap();
+    });
+
+    // ── Long-press detection ──────────────────────────────────────────────
     btn.addEventListener("pointerdown", (e) => {
       if (e.pointerType === "mouse" && e.button !== 0) return;
-      armed = true;
       didRepeat = false;
       btn.classList.add("bsl-step-active");
-      try { btn.setPointerCapture(e.pointerId); } catch { /* no-op */ }
       holdT = setTimeout(() => {
         didRepeat = true;
         tap();
         repeatT = setInterval(tap, 60);
-      }, 450);
+      }, 500);
     });
 
-    const finish = (commit) => {
-      if (!armed) return;
-      armed = false;
+    const stopHold = () => {
       clearTimeout(holdT);
       clearInterval(repeatT);
       btn.classList.remove("bsl-step-active");
-      if (commit && !didRepeat) tap();
-      didRepeat = false;
     };
-
-    btn.addEventListener("pointerup",     () => finish(true));
-    btn.addEventListener("pointercancel", () => finish(false));
-    btn.addEventListener("pointerleave",  () => finish(false));
-
-    // Keyboard activation — both Enter and Space.
-    btn.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        tap();
-      }
-    });
+    btn.addEventListener("pointerup",     stopHold);
+    btn.addEventListener("pointercancel", stopHold);
+    btn.addEventListener("pointerleave",  stopHold);
   }
 
   _seekStart(e) {

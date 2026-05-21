@@ -6,11 +6,11 @@
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0d0d0f">
 <title>cymatics — v1 (membrane approx)</title>
-<link rel="stylesheet" href="styles.css?v=7ec6917d">
+<link rel="stylesheet" href="styles.css?v=8dddddde">
 
 <!-- PWA -->
-<link rel="manifest" href="manifest.webmanifest?v=7ec6917d">
-<link rel="apple-touch-icon" href="icons/icon.svg?v=7ec6917d">
+<link rel="manifest" href="manifest.webmanifest?v=8dddddde">
+<link rel="apple-touch-icon" href="icons/icon.svg?v=8dddddde">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="cymatics">
@@ -18,9 +18,9 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <meta name="cb" content="7ec6917d">
-  <link rel="icon" type="image/svg+xml" href="./cb-shapes/62.svg?v=7ec6917d">
-  <script src="./cb-badge.js?v=7ec6917d" defer></script>
+  <meta name="cb" content="8dddddde">
+  <link rel="icon" type="image/svg+xml" href="./cb-shapes/13.svg?v=8dddddde">
+  <script src="./cb-badge.js?v=8dddddde" defer></script>
 </head>
 <body>
 <main id="stage">
@@ -30,19 +30,24 @@
 
   <aside id="controls">
     <header class="head">
-      <div class="head-left">
-        <span class="title">cymatics</span>
-        <button type="button" class="about-btn" id="about-btn"
-                aria-haspopup="dialog" aria-label="about / glossary">+</button>
-      </div>
-      <div class="head-right">
-        <button type="button" id="audio-toggle" class="mute-btn"
-                aria-pressed="false" aria-label="unmute audio">🔇</button>
+      <section class="iconbar" aria-label="playback controls">
+        <button type="button" class="icon-btn" id="pause-btn"
+                aria-pressed="false" aria-label="pause">⏸&#xFE0E;</button>
+        <button type="button" class="icon-btn" id="continuous-btn"
+                aria-pressed="false" aria-label="continuous (settle-driven swap)">∞</button>
+        <button type="button" class="icon-btn" id="cycle-btn"
+                aria-pressed="false" aria-label="auto-cycle (timer-driven swap)">↻</button>
+        <button type="button" class="icon-btn" id="reseed-btn"
+                aria-label="reseed particles">↺</button>
+      </section>
+      <div class="audio-meter">
+        <button type="button" id="audio-toggle" class="audio-mute"
+                aria-pressed="false" aria-label="unmute audio">♪</button>
         <span class="freq" id="freq">— Hz</span>
       </div>
     </header>
 
-    <canvas id="scope" width="540" height="64" aria-hidden="true"></canvas>
+    <canvas id="scope" width="540" height="48" aria-hidden="true"></canvas>
 
     <p class="warn" id="mn-warn" hidden>M ≠ N required — field vanishes when equal.</p>
 
@@ -54,24 +59,11 @@
       <div id="slot-count" class="bsl-wide"></div>
     </section>
 
-    <section class="iconbar" aria-label="playback controls">
-      <button type="button" class="icon-btn" id="pause-btn"
-              aria-pressed="false" aria-label="pause">⏸</button>
-      <button type="button" class="icon-btn" id="continuous-btn"
-              aria-pressed="false" aria-label="continuous (settle-driven swap)">∞</button>
-      <button type="button" class="icon-btn" id="cycle-btn"
-              aria-pressed="false" aria-label="auto-cycle (timer-driven swap)">↻</button>
-      <button type="button" class="icon-btn" id="reseed-btn"
-              aria-label="reseed particles">↺</button>
-    </section>
-
-    <section class="readout" aria-label="performance readout">
-      <dl>
-        <dt>fps</dt><dd id="fps">—</dd>
-        <dt>ms</dt><dd id="frame-ms">—</dd>
-        <dt>n</dt><dd id="live-count">—</dd>
-      </dl>
-    </section>
+    <footer class="foot">
+      <span class="title">cymatics</span>
+      <button type="button" class="about-btn" id="about-btn"
+              aria-haspopup="dialog" aria-label="about / glossary">+</button>
+    </footer>
   </aside>
 </main>
 
@@ -109,34 +101,32 @@
 
       <dt>S — settle speed</dt>
       <dd>Multiplier on the gradient force pulling particles toward nodes
-      (0.1…3). Higher = faster settling but more overshoot. 1.0 is a good
-      middle.</dd>
+      (0.1…3). Higher = faster settling but more overshoot.</dd>
 
       <dt>P — particles</dt>
       <dd>Number of grains on the plate (2k…200k). Mobile defaults to 30k to
-      hold 60 fps; desktop to 60k. You can crank it.</dd>
+      hold 60 fps; desktop to 60k.</dd>
 
-      <dt>⏸ / ▶</dt>
+      <dt>⏸&#xFE0E; / ⏵&#xFE0E;</dt>
       <dd>Pause or play the particle integrator. The field itself is not
       affected — only motion freezes.</dd>
 
       <dt>∞ — continuous</dt>
-      <dd>Once particles have <em>settled</em> on the current (M, N), pick a
-      fresh random (M, N) and re-energize the cloud. Trigger is an EMA of
-      mean particle speed crossing a threshold, not a clock. Pressing
-      <code>&lt;</code> or <code>&gt;</code> always overrides; the swap clock
-      resets to give your choice ~1.8 s to settle.</dd>
+      <dd>Once particles have <em>settled</em> on the current (M, N), the
+      cloud is reseeded to a uniform sprinkle and a fresh random (M, N) is
+      picked. Reseeding before the new field engages amplifies the visual
+      transition. Pressing <code>&lt;</code> or <code>&gt;</code> always
+      overrides; the swap clock resets to give your choice ~1.8 s.</dd>
 
       <dt>↻ — auto-cycle</dt>
-      <dd>Swap (M, N) on a fixed 4-second timer regardless of settle state.
-      If both ∞ and ↻ are on, the settle trigger wins (it's the more
-      physical of the two).</dd>
+      <dd>Same reseed-then-swap, but on a fixed 4-second timer regardless of
+      settle state. If both ∞ and ↻ are on, the settle trigger wins.</dd>
 
       <dt>↺ — reseed</dt>
       <dd>Re-randomize every particle's position. Useful when the cloud has
       clumped or you want a fresh start without touching the field.</dd>
 
-      <dt>🔇 / 🔊</dt>
+      <dt>♪</dt>
       <dd>Toggle the synth tone. Default muted (browser policy — the
       <code>AudioContext</code> only spins up on your first unmute click).</dd>
     </dl>
@@ -154,6 +144,6 @@
   </div>
 </dialog>
 
-<script type="module" src="src/main.js?v=7ec6917d"></script>
+<script type="module" src="src/main.js?v=8dddddde"></script>
 </body>
 </html>

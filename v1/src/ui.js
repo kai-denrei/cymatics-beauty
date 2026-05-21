@@ -81,9 +81,14 @@ export function wireUI(state, opts = {}) {
     }
   }
 
+  // U+FE0E (variation selector-15) forces text-style rendering on iOS;
+  // without it, ⏸/⏵ default to color emoji.
+  const GLYPH_PAUSE = "⏸︎";
+  const GLYPH_PLAY  = "⏵︎";
+
   pauseBtn.addEventListener("click", () => {
     state.paused = !state.paused;
-    setToggle(pauseBtn, state.paused, "▶", "⏸");
+    setToggle(pauseBtn, state.paused, GLYPH_PLAY, GLYPH_PAUSE);
     pauseBtn.setAttribute("aria-label", state.paused ? "play" : "pause");
   });
 
@@ -104,9 +109,10 @@ export function wireUI(state, opts = {}) {
   });
 
   // --- Audio -----------------------------------------------------------------
+  // ♪ stays as the glyph; state is conveyed by aria-pressed (color shift).
   audioBtn.addEventListener("click", () => {
     state.audioMuted = !state.audioMuted;
-    setToggle(audioBtn, !state.audioMuted, "🔊", "🔇");
+    setToggle(audioBtn, !state.audioMuted);
     audioBtn.setAttribute("aria-label", state.audioMuted ? "unmute audio" : "mute audio");
     state.onAudioToggle?.(state.audioMuted);
   });
