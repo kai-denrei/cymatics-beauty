@@ -101,10 +101,10 @@ export function setupLive(state, audio, opts = {}) {
 // cymatics tab can populate its dropdown without needing the studio open.
 // If you add/remove a preset in studio.html, mirror it here.
 export const PRESET_OPTIONS = [
-  { key: 'gm-trance',    label: 'G-minor trance'        },
-  { key: 'am-trance',    label: 'A-minor trance'        },
-  { key: 'ambient-72',   label: 'Ambient — slow'        },
-  { key: 'dnb-170',      label: 'DnB — 170'             },
-  { key: 'chaconne',     label: 'Chaconne — D-minor'    },
-  { key: 'greensleeves', label: 'Greensleeves — D-dor.' },
+  { key: 'gm-trance',    label: 'G-minor trance · 138'      },
+  { key: 'am-trance',    label: 'A-minor halftime · 110'    },
+  { key: 'ambient-72',   label: 'Ambient · 72'              },
+  { key: 'dnb-170',      label: 'DnB · 170'                 },
+  { key: 'chaconne',     label: 'Chaconne (solemn) · 124'   },
+  { key: 'greensleeves', label: 'Greensleeves (folk) · 100' },
 ];
