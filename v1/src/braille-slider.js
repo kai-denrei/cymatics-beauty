@@ -78,7 +78,12 @@ export class BrailleSlider {
   constructor({ mount, min, max, step, value, label, palette = "amber", format }) {
     this.min = min;
     this.max = max;
-    this.step = step;
+    // NOTE: `stepSize`, not `step`. We also have a `step(dir)` method below;
+    // an instance property named `step` would SHADOW that method (instance
+    // properties beat prototype methods on lookup) and cause every < / >
+    // tap to throw TypeError silently inside the event handler. This bug
+    // was responsible for three rounds of "buttons don't work."
+    this.stepSize = step;
     this.value = this._snap(value ?? min);
     this.palette = PALETTES[palette] || PALETTES.amber;
     this.format = format || ((v) => String(v));
@@ -205,13 +210,13 @@ export class BrailleSlider {
   }
 
   _snap(v) {
-    const k = Math.round((v - this.min) / this.step);
-    const snapped = this.min + k * this.step;
+    const k = Math.round((v - this.min) / this.stepSize);
+    const snapped = this.min + k * this.stepSize;
     return Math.max(this.min, Math.min(this.max, snapped));
   }
 
   step(dir) {
-    this.setValue(this._snap(this.value + dir * this.step));
+    this.setValue(this._snap(this.value + dir * this.stepSize));
   }
 
   setValue(v, opts = {}) {
