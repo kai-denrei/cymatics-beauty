@@ -1,7 +1,7 @@
 // Web Worker. Owns the field and gradient buffers; transfers them to main on
 // every (m, n) change. Per spec: transfer, do not structured-clone copy.
 
-import { computeField } from "./field.js?v=5890bbbd";
+import { computeField } from "./field.js?v=6ba6fc62";
 
 self.onmessage = (e) => {
   const { type, m, n } = e.data;

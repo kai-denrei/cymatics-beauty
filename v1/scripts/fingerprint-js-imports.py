@@ -36,21 +36,17 @@ DEFAULT_SKIP_DIRS = {
     "cb-shapes",
 }
 
-# Matches:    from "./foo.js"     or    from './foo.js'
-# Groups:    (prefix=`from "`)(url)(suffix=`"`)
-IMPORT_FROM_PATTERN = re.compile(
-    r'(\bfrom\s+["\'])(\.{1,2}/[^"\']+?\.js)(["\'])'
-)
+# The url group captures `.js` AND any existing `?query` — without that the
+# second bust would see `./X.js?v=OLD` as non-matching and emit zero changes.
+_URL = r'\.{1,2}/[^"\']+?\.js(?:\?[^"\']*)?'
 
-# Matches:    import("./foo.js")
-IMPORT_DYNAMIC_PATTERN = re.compile(
-    r'(\bimport\s*\(\s*["\'])(\.{1,2}/[^"\']+?\.js)(["\']\s*\))'
-)
-
-# Matches:    new URL("./foo.js", import.meta.url)
-# Or:         new URL('./foo.js', import.meta.url)
-WORKER_URL_PATTERN = re.compile(
-    r'(\bnew\s+URL\s*\(\s*["\'])(\.{1,2}/[^"\']+?\.js)(["\']\s*,\s*import\.meta\.url\s*\))'
+# from "./foo.js" | from "./foo.js?v=..."
+IMPORT_FROM_PATTERN     = re.compile(rf'(\bfrom\s+["\'])({_URL})(["\'])')
+# import("./foo.js")  | import("./foo.js?v=...")
+IMPORT_DYNAMIC_PATTERN  = re.compile(rf'(\bimport\s*\(\s*["\'])({_URL})(["\']\s*\))')
+# new URL("./foo.js", import.meta.url) | new URL("./foo.js?v=...", ...)
+WORKER_URL_PATTERN      = re.compile(
+    rf'(\bnew\s+URL\s*\(\s*["\'])({_URL})(["\']\s*,\s*import\.meta\.url\s*\))'
 )
 
 
