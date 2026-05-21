@@ -160,6 +160,9 @@ body {
   z-index: 100;
   overflow: hidden;
 }
+/* Author display:flex above wins over UA [hidden]{display:none} at equal
+   specificity — re-assert hidden so the JS toggle actually hides. */
+.live-menu[hidden] { display: none; }
 
 .live-menu-item {
   background: transparent;

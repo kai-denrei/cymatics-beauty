@@ -57,20 +57,38 @@ export function setupLive(state, audio, opts = {}) {
       state.sliders.m.setValue(M, { silent: true });
       state.sliders.n.setValue(N, { silent: true });
       state.applyMode(M, N);
+      // Reseed on every M/N change — same rationale as main.js#triggerSwap
+      // (dev.md 2026-05-22 "Reseed-on-swap"). Without this, particles cling
+      // to the previous field's nodal lines and the visible transition is
+      // muted to drift. The studio's d.reseed flag only fires every 4 beats,
+      // which is too sparse to make per-beat M/N changes legible. The new
+      // (M, N) field arrives ~10ms after applyMode posts to the worker;
+      // scattering the cloud *now* means the new field pulls a uniform
+      // sprinkle into shape rather than nudging an already-settled cluster.
+      state.reseedRequested = true;
       lastM = M; lastN = N;
     }
 
-    // J / S always apply, even during a manual M/N override window.
-    if (typeof J === 'number') {
-      state.temperature = J;
-      state.sliders.temp.setValue(J, { silent: true });
+    // Temperature driven by bass band, not the studio's J envelope. J was
+    // a smoothed proxy that decayed via lerp; d.bass is the raw band energy
+    // and pulses harder per kick — gives the cloud audible jitter instead
+    // of the prior ~tiny J*0.0035 contribution. Multiplier 4 maps typical
+    // bass (0.05–0.4) into a wide visible band, clamped at 1.
+    if (typeof d.bass === 'number') {
+      const T = Math.min(1, d.bass * 4);
+      state.temperature = T;
+      state.sliders.temp.setValue(T, { silent: true });
     }
     if (typeof S === 'number') {
       state.speed = S;
       state.sliders.speed.setValue(S, { silent: true });
     }
 
-    if (d.reseed) state.reseedRequested = true;
+    // Reseed on every detected kick, not only on the studio's d.reseed flag
+    // (which fires every 4th beat — too sparse to make the visual feel
+    // locked to the audio). Pairs with bass-driven temperature so each
+    // kick produces both a scatter and a jitter spike.
+    if (d.reseed || d.beat) state.reseedRequested = true;
   };
 
   function setActive(on) {

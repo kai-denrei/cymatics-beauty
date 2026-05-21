@@ -7,24 +7,29 @@ last-updated: 2026-05-21
 
 # Project Management
 
-## ⚠ RESUME HERE — 2026-05-22
+## ⚠ RESUME HERE — 2026-05-21 (end of session)
 
-Two failures the user flagged at the close of the long iteration session and asked to solve **fresh** on the next context:
+Both unresolved failures from the prior session were ROOT-CAUSED and FIXED this session via eng-review dispatch. Current cache-bust token: **`8bd0d12a`**.
 
-1. **Main page ↔ Studio LINKS BROKEN.** User says the pages "somewhat work individually, but their links are broken." Specific symptom not yet pinpointed. Diagnostic candidates:
-   - `↗` button on the cymatics iconbar — opens `./studio.html` in a new tab; does the URL forward `?chan=` correctly? Does the new tab actually receive focus / load?
-   - `↗ field` back-link in studio header — does it carry `?chan=` back to the cymatics URL?
-   - Embedded iframe `studio.html?headless=1` — does the iframe finish loading before the user picks a preset? Does its `controlChan` listener register before the message arrives? Is the iframe's `chan` matching the parent's?
-   - ⌁ dropdown → preset pick — does `live.sendControl({type:'preset', key})` actually reach the iframe? Verify by listening on `cymatics-control` from the dev console of cymatics tab.
-2. **Cymatics VISUALS don't reflect the currently-selected tune** on either page. This is the basic v2 functionality and is failing despite ~20 commits aimed at it.
+### Fixes shipped this session
 
-**Resume procedure (don't iterate, diagnose):**
-1. Open `studio.html` standalone (no `?headless`) in a single tab. Pick `gm-trance`. Hit ▶. Read the on-screen M/N readout in the right pane: do M and N actually change on each beat? If NOT, the studio engine itself is broken — `mapToField` outputs static values regardless of audio. That's the bug.
-2. If YES — M/N change in studio standalone — open cymatics in a new tab. Click `⌁`, pick the same preset. Does the cymatics field move? If NOT, the bridge (or the receiver) is broken.
-3. If field doesn't move: open cymatics dev console, install a `BroadcastChannel('cymatics').onmessage = e => console.log(e.data)` shim. Pick a preset. Are messages arriving? If not, the iframe isn't broadcasting (autoplay blocked, AudioContext not unlocked).
-4. If messages arrive but field doesn't move: `v1/src/live.js#onmessage` isn't applying. Could be: gated wrongly on `active`, `state.sliders` not wired, `state.applyMode` missing — log around the assignment lines.
+1. **Links broken — fixed in `v1/studio.html`.** The `↗ field` back-link had `target="_blank"`. Navigating cymatics → studio → back spawned a *second* cymatics tab whose hidden iframe instantiated a second studio engine on the same `BroadcastChannel('cymatics')` → dual broadcasters → "continuity lost / two sounds" pathology. Removed target; same-tab navigation now reuses the cymatics tab.
+2. **Cymatics didn't react to mode changes — fixed in `v1/src/live.js`.** Receiver applied M/N to sliders + worker but never reseeded particles. Studio's `d.reseed` only fires every 4 beats. Between reseeds particles clung to prior field's nodal lines → mode swaps muted to drift. Added `state.reseedRequested = true` on every M/N change (mirrors `main.js#triggerSwap`'s reseed-then-apply pattern).
+3. **Cymatics still didn't move much with the tune — diagnosed root cause + shipped 2-line follow-up.** Receiver was applying M/N (rare changes for most presets — cen01/bass are stable beat-to-beat) and `J/S` (continuous but jitter contribution is `J*0.0035` ≈ invisible). RMS / bass / mid / treble / centroid were *broadcast but discarded*. Changed `state.temperature = J` → `state.temperature = min(1, d.bass * 4)` so the cloud jitters with the kick directly. Changed `if (d.reseed)` → `if (d.reseed || d.beat)` so every kick scatters the cloud.
+4. **`⌁` dropdown was always visible — fixed in `v1/styles.css`.** Author `.live-menu { display: flex }` was winning at equal specificity over UA `[hidden] { display: none }`. Added `.live-menu[hidden] { display: none; }` so the JS toggle actually toggles.
 
-**DO NOT** rewrite event handlers, restructure preset content, or do another cache-bust round before doing steps 1-4. The user spent half a session watching us iterate on the wrong layer.
+### Parked / open
+
+- **chaconne preset spectrally degenerate** — M=11 N=12 dead static. Audio features collapse in the bands `analyze()` reads. Not yet investigated.
+- **Studio preview field vs cymatics field — different equations and integrators.** Studio analytic-gradient on |f|, cymatics central-diff on grid + bilinear sample, plus heavy damping (`particles.js:60` damp=0.86). User prefers studio's look. HIGH-RISK to unify; flagged.
+- **Hypothesis to test next session (user-stated 2026-05-21):** the non-LIVE buttons (`continuous`, `autoCycle`, reseed, swap, < / > on M/N sliders) may interfere with presets when LIVE is on. main.js:194-208 gates `triggerSwap` on `!state.live`, but verify EVERY state-mutating handler in ui.js has the same gate. Look for: reseed button, count slider, temp slider, speed slider, manual M/N tap (commitMode writes `liveOverrideUntil` — but does anything overshoot the 1.8s window?). Audit pattern: grep for state mutations in ui.js, check each for live-active gate.
+- **Tuning dials for this session's "feel"**: `live.js:78` bass multiplier (currently `* 4`); `live.js:91` reseed-on-beat (currently `d.reseed || d.beat` → reseeds every kick which at 138bpm trance is ~2.3 Hz). If too strobe-y, drop to `d.reseed || (d.beat && beatCount % 2 === 0)` or similar.
+
+### Resume procedure (next session)
+
+1. Read this block. Skip the 5-step QA diagnostic — those failures are now resolved. The active hypothesis is the button-interference one (see Parked / open above).
+2. `cd /Users/minikai/Dev/cymatics-beauty/v1 && python3 -m http.server 8771 --bind 127.0.0.1` if no server is up. Token already current at `8bd0d12a`.
+3. **DO NOT** redo the link-broken or reseed-on-mode-change fixes — they're shipped. Verify token is `8bd0d12a` or newer before iterating.
 
 ## Scope
 Owns scope, sequencing, and the "stop and report" discipline at each validation gate. This role is also the seat of the dispatched PM subagent.
