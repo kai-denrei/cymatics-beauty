@@ -360,6 +360,9 @@ function stopTransport(){ playing=false; clearInterval(timer); timer=null; }
 const CHAN=new URLSearchParams(location.search).get('chan')||'cymatics';
 $('chname').textContent=CHAN;
 const chan=new BroadcastChannel(CHAN);
+// Inbound control channel: the cymatics tab can request preset swaps via
+// {type:'preset', key}. Outbound audio-feature broadcasts stay on `chan`.
+const controlChan=new BroadcastChannel(CHAN+'-control');
 // Forward the current ?chan= (if any) onto the ↗ field back-link so two-tab
 // testing chains: opening the link carries the channel-name override across.
 {
@@ -722,9 +725,30 @@ for(const [k,v] of Object.entries(PRESETS)){
   o.value = k; o.textContent = v.label;
   presetSel.appendChild(o);
 }
-presetSel.value = 'gm-trance';
+// Initial preset can be overridden by ?preset=KEY in the URL — used by the
+// cymatics tab's ⌁ dropdown when opening the studio for the first time.
+const _urlPreset = new URLSearchParams(location.search).get('preset');
+const _initialKey = (_urlPreset && PRESETS[_urlPreset]) ? _urlPreset : 'gm-trance';
+presetSel.value = _initialKey;
 presetSel.addEventListener('change', () => loadPreset(presetSel.value));
-loadPreset('gm-trance');
+loadPreset(_initialKey);
+
+// ?autoplay=1 starts playback automatically. Browsers may block this without
+// a user gesture — on iOS Safari the user must tap ▶ once. Best-effort.
+if (new URLSearchParams(location.search).get('autoplay') === '1') {
+  setTimeout(() => { if (!playing) $('play').click(); }, 120);
+}
+
+// Listen for remote preset swaps from the cymatics tab's ⌁ dropdown.
+controlChan.onmessage = (e) => {
+  const d = e.data;
+  if (!d || typeof d !== 'object') return;
+  if (d.type === 'preset' && typeof d.key === 'string' && PRESETS[d.key]) {
+    presetSel.value = d.key;
+    loadPreset(d.key);
+    if (!playing) $('play').click();   // auto-play on remote swap
+  }
+};
 
 $('play').addEventListener('click',()=>{
   if(!playing){ startTransport(); $('play').textContent='■ stop'; $('play').classList.add('on'); }

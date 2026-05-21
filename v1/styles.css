@@ -139,6 +139,61 @@ body {
   100% { transform: scale(1); }
 }
 
+/* ⌁ wrapper + dropdown ---------------------------------------------------- */
+.live-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.live-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 200px;
+  max-width: 280px;
+  background: var(--bg-elev);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.live-menu-item {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-align: left;
+  padding: 9px 12px;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.live-menu-item:last-child { border-bottom: 0; }
+
+.live-menu-item:hover,
+.live-menu-item:focus-visible {
+  background: rgba(63, 182, 168, 0.10);
+  color: var(--teal);
+  outline: none;
+}
+
+.live-menu-item[data-preset="off"] {
+  color: var(--ink-dim);
+  font-style: italic;
+}
+
+.live-menu-item[data-preset="off"]:hover {
+  color: var(--warn);
+  background: rgba(194, 84, 80, 0.08);
+}
+
 /* Studio-detected hint — pulses on ⌁ when a broadcast is arriving but
    LIVE is still off. Only the visual; the receiver stays inert. */
 .icon-btn.detect {

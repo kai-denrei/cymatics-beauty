@@ -6,11 +6,11 @@
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0d0d0f">
 <title>cymatics — v1 (membrane approx)</title>
-<link rel="stylesheet" href="styles.css?v=43bda37c">
+<link rel="stylesheet" href="styles.css?v=5a82704b">
 
 <!-- PWA -->
-<link rel="manifest" href="manifest.webmanifest?v=43bda37c">
-<link rel="apple-touch-icon" href="icons/icon.svg?v=43bda37c">
+<link rel="manifest" href="manifest.webmanifest?v=5a82704b">
+<link rel="apple-touch-icon" href="icons/icon.svg?v=5a82704b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="cymatics">
@@ -18,9 +18,9 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <meta name="cb" content="43bda37c">
-  <link rel="icon" type="image/svg+xml" href="./cb-shapes/03.svg?v=43bda37c">
-  <script src="./cb-badge.js?v=43bda37c" defer></script>
+  <meta name="cb" content="5a82704b">
+  <link rel="icon" type="image/svg+xml" href="./cb-shapes/26.svg?v=5a82704b">
+  <script src="./cb-badge.js?v=5a82704b" defer></script>
 </head>
 <body>
 <main id="stage">
@@ -32,17 +32,28 @@
     <header class="head">
       <section class="iconbar" aria-label="playback controls">
         <button type="button" class="icon-btn" id="pause-btn"
-                aria-pressed="false" aria-label="pause">⏸&#xFE0E;</button>
+                aria-pressed="false" aria-label="pause"
+                title="pause particle motion">⏸&#xFE0E;</button>
         <button type="button" class="icon-btn" id="continuous-btn"
-                aria-pressed="false" aria-label="continuous (settle-driven swap)">∞</button>
+                aria-pressed="false" aria-label="continuous (settle-driven swap)"
+                title="continuous — settle-driven mode swap">∞</button>
         <button type="button" class="icon-btn" id="cycle-btn"
-                aria-pressed="false" aria-label="auto-cycle (timer-driven swap)">↻</button>
+                aria-pressed="false" aria-label="auto-cycle (timer-driven swap)"
+                title="auto-cycle — 4s timer mode swap">↻</button>
         <button type="button" class="icon-btn" id="reseed-btn"
-                aria-label="reseed particles">↺</button>
-        <button type="button" class="icon-btn" id="live-btn"
-                aria-pressed="false" aria-label="live audio on">⌁</button>
+                aria-label="reseed particles"
+                title="reseed — re-randomize particle positions">↺</button>
+        <div class="live-wrap">
+          <button type="button" class="icon-btn" id="live-btn"
+                  aria-pressed="false" aria-haspopup="menu" aria-expanded="false"
+                  aria-label="live audio — pick a preset"
+                  title="live — pick a studio preset">⌁</button>
+          <div class="live-menu" id="live-menu" role="menu" hidden></div>
+        </div>
         <a class="icon-btn" id="studio-link" href="./studio.html"
-           target="_blank" rel="noopener" aria-label="open studio in new tab">↗</a>
+           target="_blank" rel="noopener"
+           aria-label="open studio in new tab"
+           title="open studio in a new tab">↗</a>
       </section>
       <div class="audio-meter">
         <button type="button" id="audio-toggle" class="audio-mute"
@@ -147,6 +158,6 @@
   </div>
 </dialog>
 
-<script type="module" src="src/main.js?v=43bda37c"></script>
+<script type="module" src="src/main.js?v=5a82704b"></script>
 </body>
 </html>

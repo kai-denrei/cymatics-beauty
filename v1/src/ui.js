@@ -4,7 +4,8 @@
 // speed). Icon buttons replace native toggles for pause / continuous /
 // cycle / reseed. About dialog opens on the "+" trigger.
 
-import { BrailleSlider } from "./braille-slider.js?v=43bda37c";
+import { BrailleSlider } from "./braille-slider.js?v=5a82704b";
+import { PRESET_OPTIONS } from "./live.js?v=5a82704b";
 
 export function wireUI(state, opts = {}) {
   const $ = (id) => document.getElementById(id);
@@ -142,20 +143,89 @@ export function wireUI(state, opts = {}) {
   });
 
   // --- LIVE (audio-reactive driver) ------------------------------------------
-  // ⌁ flips state.live; the live receiver in main.js gates auto-cycle/cont.
-  // off, and we disable those buttons here to make the precedence visible.
-  // Auto-mute the internal ♪ when LIVE comes on (studio is the sound source,
-  // running both produces a doubled, detuned drone). No auto-unmute on off —
-  // user owns ♪ from then on.
-  if (liveBtn && live) {
-    liveBtn.addEventListener("click", () => {
-      const on = !live.active;
-      live.setActive(on);
-      setToggle(liveBtn, on);
-      liveBtn.setAttribute("aria-label", on ? "live audio off" : "live audio on");
-      if (on && !state.audioMuted) {
-        audioBtn.click();   // share the mute path so ♪ aria-pressed stays in sync.
+  // ⌁ now opens a dropdown of presets. Picking a preset:
+  //   - enables LIVE (auto-mutes internal ♪ to avoid double-drone)
+  //   - sends {type:'preset', key} on the cymatics-control channel if the
+  //     studio is already broadcasting (live.isBroadcastFresh()), so the
+  //     studio swaps to that preset in place — no new tab spawned
+  //   - otherwise opens studio.html?preset=KEY&autoplay=1 in a named tab
+  //     ("cymatics-studio") so picking again just re-targets the same tab
+  // Picking "off" disables LIVE without touching the studio (audio keeps
+  // playing on the other tab; cymatics just stops binding to it).
+  const liveMenu = $("live-menu");
+  if (liveBtn && live && liveMenu) {
+    // Build menu items.
+    function makeItem(key, label) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "live-menu-item";
+      b.dataset.preset = key;
+      b.role = "menuitem";
+      b.textContent = label;
+      return b;
+    }
+    liveMenu.appendChild(makeItem("off", "off"));
+    for (const { key, label } of PRESET_OPTIONS) {
+      liveMenu.appendChild(makeItem(key, label));
+    }
+
+    function closeMenu() {
+      liveMenu.hidden = true;
+      liveBtn.setAttribute("aria-expanded", "false");
+    }
+    function openMenu() {
+      liveMenu.hidden = false;
+      liveBtn.setAttribute("aria-expanded", "true");
+      // Close on next outside click (or Esc).
+      setTimeout(() => {
+        const onDoc = (e) => {
+          if (!e.target.closest("#live-menu") && e.target !== liveBtn) {
+            closeMenu();
+            document.removeEventListener("click", onDoc, true);
+          }
+        };
+        document.addEventListener("click", onDoc, true);
+      }, 0);
+    }
+    function pickPreset(key) {
+      if (key === "off") {
+        if (live.active) {
+          live.setActive(false);
+          setToggle(liveBtn, false);
+          liveBtn.setAttribute("aria-label", "live audio — pick a preset");
+        }
+        return;
       }
+      // Engage LIVE if not already on.
+      if (!live.active) {
+        live.setActive(true);
+        setToggle(liveBtn, true);
+        liveBtn.setAttribute("aria-label", "live audio active");
+        if (!state.audioMuted) audioBtn.click();  // auto-mute internal ♪
+      }
+      // Drive the studio: in-place if broadcasting, otherwise open a tab.
+      if (live.isBroadcastFresh()) {
+        live.sendControl({ type: "preset", key });
+      } else {
+        const chan = new URL(location.href).searchParams.get("chan");
+        let url = "./studio.html?preset=" + encodeURIComponent(key) + "&autoplay=1";
+        if (chan) url += "&chan=" + encodeURIComponent(chan);
+        window.open(url, "cymatics-studio");
+      }
+    }
+
+    liveMenu.addEventListener("click", (e) => {
+      const item = e.target.closest(".live-menu-item");
+      if (!item) return;
+      pickPreset(item.dataset.preset);
+      closeMenu();
+    });
+    liveBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (liveMenu.hidden) openMenu(); else closeMenu();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !liveMenu.hidden) closeMenu();
     });
 
     live.onChange((on) => {

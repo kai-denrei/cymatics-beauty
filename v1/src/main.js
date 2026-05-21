@@ -2,10 +2,10 @@
 // particle integrator + ImageData renderer. Also owns the audio synth and the
 // settlement-detected "continuous play" loop.
 
-import { Particles }                from "./particles.js?v=43bda37c";
-import { wireUI }                   from "./ui.js?v=43bda37c";
-import { AudioEngine, drawScope, modeFrequency } from "./audio.js?v=43bda37c";
-import { setupLive }                from "./live.js?v=43bda37c";
+import { Particles }                from "./particles.js?v=5a82704b";
+import { wireUI }                   from "./ui.js?v=5a82704b";
+import { AudioEngine, drawScope, modeFrequency } from "./audio.js?v=5a82704b";
+import { setupLive }                from "./live.js?v=5a82704b";
 
 const MAX_PARTICLES = 200000;
 
@@ -63,7 +63,7 @@ particles.resize(state.count);
 let field = null;
 let pendingMode = null;
 
-const worker = new Worker(new URL("./worker.js?v=43bda37c", import.meta.url), { type: "module" });
+const worker = new Worker(new URL("./worker.js?v=5a82704b", import.meta.url), { type: "module" });
 worker.onmessage = (e) => {
   const msg = e.data;
   if (msg.type === "field") {

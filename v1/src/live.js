@@ -15,6 +15,11 @@ export function setupLive(state, audio, opts = {}) {
   const OVERRIDE_MS = opts.overrideMs ?? 1800;
 
   const ch = new BroadcastChannel(CHAN);
+  // Outbound-only control channel for discrete commands (preset selection).
+  // Distinct channel name so the 60Hz audio-feature stream and the rare
+  // control messages don't collide on a single dispatcher. STUDIO_INTEGRATION.md
+  // §0 ("one-way only") relaxed for this discrete command lane only.
+  const controlCh = new BroadcastChannel(CHAN + '-control');
   let active = false;
   let lastM = null, lastN = null;
   let lastBroadcastAt = 0;            // when we last saw any 'cymatics' msg
@@ -81,11 +86,25 @@ export function setupLive(state, audio, opts = {}) {
     return (performance.now() - lastBroadcastAt) < windowMs;
   }
 
+  function sendControl(msg) { controlCh.postMessage(msg); }
+
   return {
-    setActive, onChange, onTrack,
+    setActive, onChange, onTrack, sendControl,
     get active() { return active; },
     get track() { return lastTrackLabel; },
     channel: CHAN,
     isBroadcastFresh,
   };
 }
+
+// Preset list mirrored from v1/studio.html PRESETS. Kept here so the
+// cymatics tab can populate its dropdown without needing the studio open.
+// If you add/remove a preset in studio.html, mirror it here.
+export const PRESET_OPTIONS = [
+  { key: 'gm-trance',    label: 'G-minor trance'        },
+  { key: 'am-trance',    label: 'A-minor trance'        },
+  { key: 'ambient-72',   label: 'Ambient — slow'        },
+  { key: 'dnb-170',      label: 'DnB — 170'             },
+  { key: 'chaconne',     label: 'Chaconne — D-minor'    },
+  { key: 'greensleeves', label: 'Greensleeves — D-dor.' },
+];
