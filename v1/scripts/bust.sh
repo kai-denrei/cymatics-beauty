@@ -42,9 +42,19 @@ TOKEN=$(od -An -N4 -tx1 < /dev/urandom | tr -d ' \n')
 
 [[ -z "$QUIET" ]] && echo "▸ bumping cache-bust token to ${TOKEN}"
 
-# ---------- 1. Fingerprint same-origin asset URLs ----------
+# ---------- 1. Fingerprint same-origin asset URLs (HTML/CSS) ----------
 if [[ -f "$SKILL_DIR/scripts/fingerprint-urls.py" ]]; then
   python3 "$SKILL_DIR/scripts/fingerprint-urls.py" "$TOKEN" --target . $QUIET
+fi
+
+# ---------- 1b. Fingerprint ES-module imports in JS files ----------
+# The skill's HTML/CSS fingerprinter doesn't walk JS files, so module imports
+# (`from "./X.js"`, `import("./X.js")`, `new URL("./X.js", import.meta.url)`)
+# never receive the token and the browser caches them forever. This pass
+# closes that loophole. Script lives next to bust.sh (project-local).
+LOCAL_JS_FP="$(dirname "${BASH_SOURCE[0]}")/fingerprint-js-imports.py"
+if [[ -f "$LOCAL_JS_FP" ]]; then
+  python3 "$LOCAL_JS_FP" "$TOKEN" --target . $QUIET
 fi
 
 # File walker. Returns extension-filtered paths, excluding build/vendor dirs
