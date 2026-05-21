@@ -4,8 +4,8 @@
 // speed). Icon buttons replace native toggles for pause / continuous /
 // cycle / reseed. About dialog opens on the "+" trigger.
 
-import { BrailleSlider } from "./braille-slider.js?v=5a82704b";
-import { PRESET_OPTIONS } from "./live.js?v=5a82704b";
+import { BrailleSlider } from "./braille-slider.js?v=14d5147d";
+import { PRESET_OPTIONS } from "./live.js?v=14d5147d";
 
 export function wireUI(state, opts = {}) {
   const $ = (id) => document.getElementById(id);
@@ -194,24 +194,24 @@ export function wireUI(state, opts = {}) {
           setToggle(liveBtn, false);
           liveBtn.setAttribute("aria-label", "live audio — pick a preset");
         }
+        // Also tell the headless engine to stop, so the audio actually
+        // ceases instead of just disconnecting the field-binding.
+        live.sendControl({ type: "stop" });
         return;
       }
-      // Engage LIVE if not already on.
+      // Engage LIVE if not already on. The hidden studio-engine iframe (loaded
+      // on every cymatics page load) receives the preset command via the
+      // cymatics-control channel, swaps preset, starts transport, broadcasts
+      // back — the field then binds via the existing live.js receiver path.
+      // The iframe is same-origin, so user activation from this click
+      // propagates and unlocks the iframe's AudioContext.
       if (!live.active) {
         live.setActive(true);
         setToggle(liveBtn, true);
         liveBtn.setAttribute("aria-label", "live audio active");
         if (!state.audioMuted) audioBtn.click();  // auto-mute internal ♪
       }
-      // Drive the studio: in-place if broadcasting, otherwise open a tab.
-      if (live.isBroadcastFresh()) {
-        live.sendControl({ type: "preset", key });
-      } else {
-        const chan = new URL(location.href).searchParams.get("chan");
-        let url = "./studio.html?preset=" + encodeURIComponent(key) + "&autoplay=1";
-        if (chan) url += "&chan=" + encodeURIComponent(chan);
-        window.open(url, "cymatics-studio");
-      }
+      live.sendControl({ type: "preset", key });
     }
 
     liveMenu.addEventListener("click", (e) => {

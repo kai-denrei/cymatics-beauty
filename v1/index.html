@@ -6,11 +6,11 @@
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0d0d0f">
 <title>cymatics — v1 (membrane approx)</title>
-<link rel="stylesheet" href="styles.css?v=5a82704b">
+<link rel="stylesheet" href="styles.css?v=14d5147d">
 
 <!-- PWA -->
-<link rel="manifest" href="manifest.webmanifest?v=5a82704b">
-<link rel="apple-touch-icon" href="icons/icon.svg?v=5a82704b">
+<link rel="manifest" href="manifest.webmanifest?v=14d5147d">
+<link rel="apple-touch-icon" href="icons/icon.svg?v=14d5147d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="cymatics">
@@ -18,9 +18,9 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <meta name="cb" content="5a82704b">
-  <link rel="icon" type="image/svg+xml" href="./cb-shapes/26.svg?v=5a82704b">
-  <script src="./cb-badge.js?v=5a82704b" defer></script>
+  <meta name="cb" content="14d5147d">
+  <link rel="icon" type="image/svg+xml" href="./cb-shapes/20.svg?v=14d5147d">
+  <script src="./cb-badge.js?v=14d5147d" defer></script>
 </head>
 <body>
 <main id="stage">
@@ -158,6 +158,19 @@
   </div>
 </dialog>
 
-<script type="module" src="src/main.js?v=5a82704b"></script>
+<!-- Hidden studio engine. studio.html?headless=1 keeps its analyser +
+     scheduler + broadcast running while hiding all UI. Same-origin so user
+     activation propagates — picking a preset in the ⌁ dropdown unblocks the
+     iframe's AudioContext on the first click. allow="autoplay" required by
+     some browsers' iframe autoplay heuristics. The `chan` param is filled in
+     by main.js after page load so two-tab testing with ?chan=NAME chains. -->
+<iframe id="studio-engine"
+        src="studio.html?headless=1&v=14d5147d"
+        allow="autoplay"
+        title="cymatics studio engine (headless)"
+        aria-hidden="true"
+        style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;border:0;opacity:0;pointer-events:none"></iframe>
+
+<script type="module" src="src/main.js?v=14d5147d"></script>
 </body>
 </html>

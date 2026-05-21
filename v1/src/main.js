@@ -2,10 +2,10 @@
 // particle integrator + ImageData renderer. Also owns the audio synth and the
 // settlement-detected "continuous play" loop.
 
-import { Particles }                from "./particles.js?v=5a82704b";
-import { wireUI }                   from "./ui.js?v=5a82704b";
-import { AudioEngine, drawScope, modeFrequency } from "./audio.js?v=5a82704b";
-import { setupLive }                from "./live.js?v=5a82704b";
+import { Particles }                from "./particles.js?v=14d5147d";
+import { wireUI }                   from "./ui.js?v=14d5147d";
+import { AudioEngine, drawScope, modeFrequency } from "./audio.js?v=14d5147d";
+import { setupLive }                from "./live.js?v=14d5147d";
 
 const MAX_PARTICLES = 200000;
 
@@ -63,7 +63,7 @@ particles.resize(state.count);
 let field = null;
 let pendingMode = null;
 
-const worker = new Worker(new URL("./worker.js?v=5a82704b", import.meta.url), { type: "module" });
+const worker = new Worker(new URL("./worker.js?v=14d5147d", import.meta.url), { type: "module" });
 worker.onmessage = (e) => {
   const msg = e.data;
   if (msg.type === "field") {
@@ -110,12 +110,19 @@ state.live = false;   // initial; live.setActive will flip it
 wireUI(state, { defaultCount: DEFAULT_COUNT, live });
 requestMode(state.m, state.n);
 
-// Forward the current ?chan= (if any) onto the studio-link href so two-tab
-// testing on a custom channel chains.
-const studioLink = document.getElementById("studio-link");
-if (studioLink) {
+// Forward the current ?chan= (if any) onto both the studio-link href (visible
+// ↗ button → editor view) AND the hidden headless engine iframe. Two-tab
+// testing with ?chan=NAME chains across all three contexts.
+{
   const c = new URL(location.href).searchParams.get("chan");
-  if (c) studioLink.href = "./studio.html?chan=" + encodeURIComponent(c);
+  const studioLink = document.getElementById("studio-link");
+  if (studioLink && c) {
+    studioLink.href = "./studio.html?chan=" + encodeURIComponent(c);
+  }
+  const engineFrame = document.getElementById("studio-engine");
+  if (engineFrame && c) {
+    engineFrame.src = "./studio.html?headless=1&chan=" + encodeURIComponent(c);
+  }
 }
 
 // ImageData byte order is R,G,B,A. On little-endian (every browser target here),

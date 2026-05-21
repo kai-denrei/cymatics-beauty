@@ -63,6 +63,12 @@
   .chrow{display:flex; align-items:center; gap:8px; margin-top:10px; color:var(--dim); font-size:11px}
   .chrow code{color:var(--teal)}
   .pill{border:1px solid var(--line); border-radius:999px; padding:2px 9px; color:var(--amber); font-size:10px}
+  /* ?headless=1 — engine-only mode used when this page is embedded as a
+     hidden iframe inside the cymatics tab. Visible UI is suppressed; the
+     module script keeps running, analyser + scheduler tick, broadcast fires. */
+  body.headless { background: transparent; }
+  body.headless > header,
+  body.headless > main { display: none !important; }
 </style>
 
 <header>
@@ -363,6 +369,12 @@ const chan=new BroadcastChannel(CHAN);
 // Inbound control channel: the cymatics tab can request preset swaps via
 // {type:'preset', key}. Outbound audio-feature broadcasts stay on `chan`.
 const controlChan=new BroadcastChannel(CHAN+'-control');
+// Headless mode: when the cymatics tab embeds this page as a hidden iframe
+// it passes ?headless=1. We hide all visible UI and skip the preview-canvas
+// render (saves ~12k particle writes per frame). Engine, analyser,
+// scheduler, broadcast all keep running.
+const HEADLESS = new URLSearchParams(location.search).get('headless') === '1';
+if (HEADLESS) document.body.classList.add('headless');
 // Forward the current ?chan= (if any) onto the ↗ field back-link so two-tab
 // testing chains: opening the link carries the channel-name override across.
 {
@@ -430,7 +442,7 @@ function loop(){
   const ft=analyze(), m=mapToField(ft);
   field.M=m.M; field.N=m.N; field.J=m.J; field.S=m.S;
   if(m.reseed) reseedParticles(); broadcast(m,ft);
-  stepParticles(field.M,field.N,field.J,field.S); drawParticles();
+  if (!HEADLESS) { stepParticles(field.M,field.N,field.J,field.S); drawParticles(); }
   $('rM').textContent=field.M; $('rN').textContent=field.N;
   $('rJ').textContent=field.J.toFixed(2); $('rS').textContent=field.S.toFixed(2);
   $('mRms').style.width=clamp(ft.rms*180,0,100)+'%'; $('mBass').style.width=clamp(ft.bass*120,0,100)+'%';
@@ -739,7 +751,7 @@ if (new URLSearchParams(location.search).get('autoplay') === '1') {
   setTimeout(() => { if (!playing) $('play').click(); }, 120);
 }
 
-// Listen for remote preset swaps from the cymatics tab's ⌁ dropdown.
+// Listen for remote commands from the cymatics tab's ⌁ dropdown.
 controlChan.onmessage = (e) => {
   const d = e.data;
   if (!d || typeof d !== 'object') return;
@@ -747,6 +759,11 @@ controlChan.onmessage = (e) => {
     presetSel.value = d.key;
     loadPreset(d.key);
     if (!playing) $('play').click();   // auto-play on remote swap
+    return;
+  }
+  if (d.type === 'stop') {
+    if (playing) $('play').click();    // toggles to stopped state
+    return;
   }
 };
 
