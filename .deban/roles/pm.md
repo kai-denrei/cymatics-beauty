@@ -7,6 +7,25 @@ last-updated: 2026-05-21
 
 # Project Management
 
+## ⚠ RESUME HERE — 2026-05-22
+
+Two failures the user flagged at the close of the long iteration session and asked to solve **fresh** on the next context:
+
+1. **Main page ↔ Studio LINKS BROKEN.** User says the pages "somewhat work individually, but their links are broken." Specific symptom not yet pinpointed. Diagnostic candidates:
+   - `↗` button on the cymatics iconbar — opens `./studio.html` in a new tab; does the URL forward `?chan=` correctly? Does the new tab actually receive focus / load?
+   - `↗ field` back-link in studio header — does it carry `?chan=` back to the cymatics URL?
+   - Embedded iframe `studio.html?headless=1` — does the iframe finish loading before the user picks a preset? Does its `controlChan` listener register before the message arrives? Is the iframe's `chan` matching the parent's?
+   - ⌁ dropdown → preset pick — does `live.sendControl({type:'preset', key})` actually reach the iframe? Verify by listening on `cymatics-control` from the dev console of cymatics tab.
+2. **Cymatics VISUALS don't reflect the currently-selected tune** on either page. This is the basic v2 functionality and is failing despite ~20 commits aimed at it.
+
+**Resume procedure (don't iterate, diagnose):**
+1. Open `studio.html` standalone (no `?headless`) in a single tab. Pick `gm-trance`. Hit ▶. Read the on-screen M/N readout in the right pane: do M and N actually change on each beat? If NOT, the studio engine itself is broken — `mapToField` outputs static values regardless of audio. That's the bug.
+2. If YES — M/N change in studio standalone — open cymatics in a new tab. Click `⌁`, pick the same preset. Does the cymatics field move? If NOT, the bridge (or the receiver) is broken.
+3. If field doesn't move: open cymatics dev console, install a `BroadcastChannel('cymatics').onmessage = e => console.log(e.data)` shim. Pick a preset. Are messages arriving? If not, the iframe isn't broadcasting (autoplay blocked, AudioContext not unlocked).
+4. If messages arrive but field doesn't move: `v1/src/live.js#onmessage` isn't applying. Could be: gated wrongly on `active`, `state.sliders` not wired, `state.applyMode` missing — log around the assignment lines.
+
+**DO NOT** rewrite event handlers, restructure preset content, or do another cache-bust round before doing steps 1-4. The user spent half a session watching us iterate on the wrong layer.
+
 ## Scope
 Owns scope, sequencing, and the "stop and report" discipline at each validation gate. This role is also the seat of the dispatched PM subagent.
 
@@ -19,8 +38,14 @@ Owns scope, sequencing, and the "stop and report" discipline at each validation 
 ## Dead Ends
 | Date | What was tried | Why it failed / was rejected |
 |---|---|---|
+| 2026-05-22 | "Fix the buttons" iteration — three separate event-handler rewrites (click → pointerup → touchend+click) across multiple turns without diagnosing the actual call target | The wiring was never the bug. The `step` instance property was shadowing the `step()` method. A single `console.log(typeof this.step)` would have ended the iteration in 30 seconds; instead it consumed ~half the session. PM lesson: when a fix doesn't land twice, demand a diagnostic step, not a third fix. |
+| 2026-05-22 | Cache-busting the HTML+entry-point on each fix and trusting the deploy log ("Pages success") to mean the fix shipped | Module imports inside .js files weren't being fingerprinted; the user's browser kept executing the cached old modules. Three commits shipped a "fix" that the user could never see. PM lesson: "shipped to GH Pages" ≠ "running in the user's browser." Require a curl-and-verify-served-content step before declaring a fix done. |
+| 2026-05-22 | Differentiating presets by only changing notes (G minor vs A minor, etc.) — keeping the same drum kit, chord rhythm, arp shape | User reported "they sound the same." Root cause: the audio→field mapping reads spectral features (centroid/bass/mid/treble), not pitch. Same drums + same instrumentation → same field, regardless of key. Fixed by re-tuning presets on (BPM, hat density, kick density, voicing) axes. PM lesson: when a visual-spec is driven by audio features, validate the feature variance, not the notation variance. |
 
 ## Lessons
+- **"Doesn't work" from a user with a specific symptom is a diagnostic signal, not a request to rewrite a layer.** Ask one more question before iterating. — from 2026-05-22
+- **A code change is not done until it's observed running in the user's browser, not just deployed.** The byte-on-server vs byte-in-browser-module-map gap is invisible to the developer and total to the user. — from 2026-05-22
+- **Iteration without diagnosis is process debt that compounds.** Three fix attempts at the wrong layer cost more than one diagnostic pause would have. When the user says "still doesn't work" the second time, stop and instrument. — from 2026-05-22
 
 ## Open Questions
 - [ ] Five untested assumptions surfaced at init (see below). Treat as PM's checklist before declaring V1 "done". — owner: gerald — since: 2026-05-21
@@ -47,6 +72,7 @@ Performed 2026-05-21 by PM subagent against served `http://localhost:8765/` (cwd
 5. **`v3/ingest_youtube.py` opt-in/local/gitignored is sufficient ToS mitigation.** — *still-untested*. Out of scope at gate 1 (v3 / phase 3). Carried forward.
 
 ## Session Log
+2026-05-22 — Long iteration session. Many surface-level fixes shipped; two foundational failures (cross-tab links, audio→visual coupling) remain unresolved. User flagged "turning in circle" — next session must START WITH DIAGNOSIS, not fixes. See ⚠ RESUME HERE at top of this file.
 2026-05-21 — Gate 1 audit complete: 5/5 spec checks pass on static read, 1 fix applied (misleading ImageData byte-order comment in main.js), token bumped to f5dcb003. Assumptions #1–#2 advanced; #3 needs user; #4–#5 deferred to later phases.
 2026-05-21 — V1 scoped, PM-subagent dispatch agreed, five assumptions surfaced as PM's gate-1 audit list.
 2026-05-21 — Studio integration complete: studio at `v1/studio.html`, receiver at `v1/src/live.js`, LIVE button + cross-link in iconbar, preset selector with 4 presets in studio. Cache-bust token rotated to `facc7321`. See `.deban/roles/dev.md` for the decision table.
