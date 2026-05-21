@@ -4,7 +4,7 @@
 // speed). Icon buttons replace native toggles for pause / continuous /
 // cycle / reseed. About dialog opens on the "+" trigger.
 
-import { BrailleSlider } from "./braille-slider.js?v=6ba6fc62";
+import { BrailleSlider } from "./braille-slider.js?v=aa9c8b45";
 
 export function wireUI(state, opts = {}) {
   const $ = (id) => document.getElementById(id);
@@ -27,27 +27,30 @@ export function wireUI(state, opts = {}) {
   const fmt2   = (v) => Number(v).toFixed(2);
 
   // --- Sliders ---------------------------------------------------------------
-  // Single-letter labels match the compact dashboard mock.
+  // Landing defaults are deliberate (see request 2026-05-21): they put the
+  // visualizer at a strong, dense pattern out of the gate, so the page
+  // looks alive on first paint rather than mid-settle. `defaultCount` from
+  // main.js is ignored on purpose — 154k particles is the chosen anchor.
   const sliders = {
     m: new BrailleSlider({
-      mount: $("slot-m"), min: 1, max: 12, step: 1, value: 3,
+      mount: $("slot-m"), min: 1, max: 12, step: 1, value: 9,
       label: "M", palette: "amber", format: fmtInt,
     }),
     n: new BrailleSlider({
-      mount: $("slot-n"), min: 1, max: 12, step: 1, value: 5,
+      mount: $("slot-n"), min: 1, max: 12, step: 1, value: 4,
       label: "N", palette: "amber", format: fmtInt,
     }),
     temp: new BrailleSlider({
-      mount: $("slot-temp"), min: 0, max: 1, step: 0.01, value: 0.5,
+      mount: $("slot-temp"), min: 0, max: 1, step: 0.01, value: 0.75,
       label: "J", palette: "amber", format: fmt2,
     }),
     speed: new BrailleSlider({
-      mount: $("slot-speed"), min: 0.1, max: 3, step: 0.05, value: 1,
+      mount: $("slot-speed"), min: 0.1, max: 3, step: 0.05, value: 1.6,
       label: "S", palette: "amber", format: fmt2,
     }),
     count: new BrailleSlider({
       mount: $("slot-count"), min: 2000, max: 200000, step: 2000,
-      value: defaultCount,
+      value: 154000,
       label: "P", palette: "teal", format: fmtInt,
     }),
   };
@@ -163,7 +166,8 @@ export function wireUI(state, opts = {}) {
   state.temperature = sliders.temp.value;
   state.speed       = sliders.speed.value;
   state.autoCycle   = false;
-  state.continuous  = false;
-  state.paused      = false;
+  state.continuous  = true;     // ∞ on by default per landing spec
+  state.paused      = false;    // play mode on
   state.audioMuted  = true;
+  setToggle(continuousBtn, state.continuous);
 }
