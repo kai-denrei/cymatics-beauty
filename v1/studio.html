@@ -582,6 +582,109 @@ lead:  ~ /16`,
 48  euclid kick 13 16       ; busier kick → roll
 56  filter 3000 8
 60  riser 4`
+  },
+
+  'chaconne': {
+    label: 'Chaconne — D-minor techno',
+    bpm: 130,
+    palette: `# Chaconne → D-minor techno · Phrygian groove + descending-tetrachord variation
+# Inspired by Bach's Chaconne in D minor (BWV 1004 / 5th movt of Partita 2).
+# Ground = D-A-Bb-A (i-V-bVI-V Phrygian feel); peak section swaps to the
+# classic chaconne descent D-C-Bb-A; bar 40 breakdown lifts to D major.
+kick:  x ~ ~ ~  x ~ ~ ~  x ~ ~ ~  x ~ ~ ~
+clap:  ~ ~ ~ ~  x ~ ~ ~  ~ ~ ~ ~  x ~ ~ ~
+chh:   ~ ~ x ~  ~ ~ x ~  ~ ~ x ~  ~ ~ x ~
+bass:  d2 d2 d2 d2  a1 a1 a1 a1  bb1 bb1 bb1 bb1  a1 a1 a1 a1  /4
+chord: d3+f3+a3  a3+cs4+e4  bb3+d4+f4  a3+cs4+e4  /16
+arp:   d4 f4 a4 f4 a4 f4 d4 f4  a4 cs5 e5 cs5 e5 cs5 a4 cs5  bb4 d5 f5 d5 f5 d5 bb4 d5  a4 cs5 e5 cs5 e5 cs5 a4 cs5  /2
+lead:  a4 a4 ~ ~  e5 e5 e5 ~  f5 d5 ~ c5  bb4 a4 g4 ~  /4`,
+    arrangement: `# Variation structure → techno sections (ground → variation → major lift → return)
+@length 64
+
+0   section ground          ; theme alone — bare statement
+0   in kick
+0   in bass
+8   in chh
+
+16  section build           ; lower voices enter
+16  in chord
+24  in arp
+24  set bass  d2 d2 d2 d2  c2 c2 c2 c2  bb1 bb1 bb1 bb1  a1 a1 a1 a1  /4   ; chaconne descent
+24  set chord d3+f3+a3  c3+e3+g3  bb3+d4+f4  a3+cs4+e4  /16
+28  in clap
+
+32  section peak           ; head motif over the descending tetrachord
+32  in lead
+
+40  section major-lift     ; the D-major middle (Bach's bar 133) = the breakdown
+40  out kick
+40  out clap
+40  out arp
+40  set chord d3+fs3+a3  a3+cs4+e4  g3+b3+d4  a3+cs4+e4  /16
+40  set bass  d2 d2 d2 d2  a1 a1 a1 a1  g1 g1 g1 g1  a1 a1 a1 a1  /4
+40  filter 1200 6
+
+52  section riser
+52  riser 8
+56  set chord d3+f3+a3  a3+cs4+e4  bb3+d4+f4  a3+cs4+e4  /16   ; back to D-minor ground
+56  set bass  d2 d2 d2 d2  a1 a1 a1 a1  bb1 bb1 bb1 bb1  a1 a1 a1 a1  /4
+56  filter 18000 4
+60  in kick
+60  in clap
+60  in arp
+# bar 64 loops → minor ground slams back = the drop`
+  },
+
+  'greensleeves': {
+    label: 'Greensleeves — D-dorian techno',
+    bpm: 130,
+    palette: `# Greensleeves → D-dorian techno  ·  PALETTE (verse ground loaded)
+# Tune: traditional 16th c. (public domain). Harmony reduced from a Mutopia
+# arrangement (CC-BY-SA 4.0 — David Kastrup); chord progression is a
+# non-copyrightable musical fact of a PD tune. Felt 6/8 → straight 4/4
+# (lilt is lost — the 16th grid can't represent triplets).
+# Loop = 4 bars. All melodic tracks total 64 sixteenth-steps (stay locked).
+kick:  x ~ ~ ~  x ~ ~ ~  x ~ ~ ~  x ~ ~ ~
+clap:  ~ ~ ~ ~  x ~ ~ ~  ~ ~ ~ ~  x ~ ~ ~
+chh:   ~ ~ x ~  ~ ~ x ~  ~ ~ x ~  ~ ~ x ~
+bass:  f2 f2 f2 f2  d2 d2 d2 d2  c2 c2 c2 c2  d2 d2 d2 d2  /4
+chord: f3+a3+c4  d3+f3+a3  c3+e3+g3  d3+f3+a3  /16
+arp:   f4 c5 a4 c5 f4 c5 a4 c5  d4 a4 f4 a4 d4 a4 f4 a4  c4 g4 e4 g4 c4 g4 e4 g4  d4 a4 f4 a4 d4 a4 f4 a4  /2
+lead:  f5 f5 g5 ~  a5 a5 b5 a5  g5 g5 e5 ~  c5 c5 d5 e5  /4`,
+    arrangement: `@length 64
+
+0   section intro
+0   in kick
+0   in bass
+8   in chh
+
+16  section verse-build
+16  in chord
+20  in clap
+24  in arp
+
+32  section verse-peak
+32  in lead
+
+40  section refrain-lift   ; swap to refrain ground — bright C open = the chorus
+40  set chord c4+e4+g4 f3+a3+c4 d3+f3+a3 a3+cs4+e4 /16
+40  set bass  c2 c2 c2 c2 f2 f2 f2 f2 d2 d2 d2 d2 a1 a1 a1 a1 /4
+
+48  section breakdown
+48  out kick
+48  out clap
+48  out arp
+48  filter 1100 6
+
+56  section riser
+56  riser 8
+56  set chord f3+a3+c4 d3+f3+a3 c3+e3+g3 d3+f3+a3 /16   ; back to verse ground
+56  set bass  f2 f2 f2 f2 d2 d2 d2 d2 c2 c2 c2 c2 d2 d2 d2 d2 /4
+60  filter 18000 4
+60  in kick
+60  in clap
+60  in arp
+# bar 64 loops → full verse ground slams back = the drop`
   }
 };
 
