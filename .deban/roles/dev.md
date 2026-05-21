@@ -2,7 +2,7 @@
 role: dev
 owner: gerald
 status: active
-last-updated: 2026-05-21
+last-updated: 2026-05-21 (v2 studio swap)
 ---
 
 # Dev
@@ -21,6 +21,8 @@ Implements v1 (vanilla JS/Canvas2D toy) and v2 (scikit-fem solver). Owns code qu
 | 2026-05-21 | LIVE on disables ∞/↻ buttons + auto-mutes ♪ via shared mute path | Spec §5: beat-snap + per-bar reseed from stream replace auto-cycle; doubled drone if both sound sources active. ♪ stays user-toggleable; no auto-unmute on LIVE off so user owns ♪ after manual intervention. | [[ux]] |
 | 2026-05-21 | Manual `<`/`>` overrides audio M/N for 1.8s via `state.liveOverrideUntil` written in `ui.js#commitMode` and read in `live.js` | Spec §5 mirrors the existing v1 override clock semantics (`lastSwapAt` in main.js). J/S still apply during the window per receiver design. | [[ux]] |
 | 2026-05-21 | `(M,N)` mapping from spectral features stays as v1 membrane cheat; `// v2:` marker at the lookup site in `live.js` | Spec §1.2 honesty: feature→mode is a cheat keyed to the membrane approx, not real plate eigenfrequencies. v2 mode bank will reinterpret. | [[arch]] |
+| 2026-05-21 | Wholesale-replaced `v1/studio.html` with the v2 arrangement-timeline base (`cymatics-studio2.html`) + 3 surgical additions: preset selector, `↗ field` back-link with `?chan=` forwarding, membrane-cheat comment on `mapToField` | Diff between v1 studio and v2 was large enough (palette/arrangement split, per-track buses, riser, master filter, bar/section readout, arrange toggle) that a surgical merge would have been harder to audit than a clean swap. BroadcastChannel payload is byte-identical — cymatics receiver untouched. | [[arch]], [[ux]] |
+| 2026-05-21 | Default preset on cold load is `gm-trance` (G minor); ships 4 presets: `gm-trance`, `am-trance`, `ambient-72`, `dnb-170` | gm-trance has the most-tested arrangement (intro→build→peak→breakdown→riser→drop@64) and matches `TranceMusicExample.md`. Each preset bundles `{label, bpm, palette, arrangement}` so swapping the selector swaps both textareas + bpm and restarts the arrangement. | [[ux]] |
 
 ## Dead Ends
 <!-- APPEND ONLY. Never delete. -->
@@ -47,3 +49,4 @@ Feeds into: [[qa]], [[ux]]
 2026-05-21 — Gate 1 static audit: all 5 JS modules pass `node --check`; one comment fixed in main.js; no functional defects found.
 2026-05-21 — Initial decisions on rendering strategy and worker transfer recorded ahead of implementation.
 2026-05-21 — Studio integration wired: `v1/studio.html`, `v1/src/live.js`, LIVE/`↗` icons in iconbar, preset selector + 4 presets in studio. All 8 JS modules pass `node --check`; cache-bust rotated to `facc7321` with 7 imports fingerprinted across 3 JS files.
+2026-05-21 — Studio v2 swap: `v1/studio.html` replaced wholesale with the arrangement-timeline base from `cymatics-studio2.html`. Re-added preset selector (4 presets, gm-trance default), `↗ field` back-link with `?chan=` forwarding, and membrane-cheat comment. Cymatics-side files (`live.js`, `main.js`, `ui.js`, `index.html`) only touched by the cache-bust rewrite — confirmed via `git diff`. Cache-bust rotated to `a9090546`.

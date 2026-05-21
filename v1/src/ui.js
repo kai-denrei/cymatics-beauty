@@ -4,7 +4,7 @@
 // speed). Icon buttons replace native toggles for pause / continuous /
 // cycle / reseed. About dialog opens on the "+" trigger.
 
-import { BrailleSlider } from "./braille-slider.js?v=facc7321";
+import { BrailleSlider } from "./braille-slider.js?v=a9090546";
 
 export function wireUI(state, opts = {}) {
   const $ = (id) => document.getElementById(id);

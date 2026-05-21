@@ -258,6 +258,17 @@ The studio posts this object every animation frame (~60 Hz) on
 One-way only: the cymatics tab never talks back. The receiver clamps `M ≠ N`
 defensively even though the emitter already enforces it.
 
+**Build-up / arrangement DSL is a studio-side concern.** The 2026-05-21 v2
+studio swap (`v1/studio.html`) adds a bar-clock arrangement layer on top of
+the palette: `in/out`, `gain`, `transpose`, `clone`, `set`, `euclid`, `fx`,
+`filter`, `riser`, `section`, `@length`. Parts gate in/out over time and a
+master low-pass sweep + riser voice produce the build-up/breakdown/drop arc.
+Four presets ship: `gm-trance` (default), `am-trance`, `ambient-72`,
+`dnb-170`. None of this changes the BroadcastChannel contract — the
+cymatics receiver still only sees the same `{M,N,J,S,beat,reseed,…}` payload
+documented above. The DSL is purely a way to shape *what* the analyser
+hears; the field listener is agnostic to arrangement structure.
+
 #### Membrane-cheat caveat (per STUDIO_INTEGRATION §1.2)
 
 The studio's feature→mode mapping is a *cheat keyed to the membrane
