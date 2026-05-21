@@ -49,3 +49,9 @@ Performed 2026-05-21 by PM subagent against served `http://localhost:8765/` (cwd
 ## Session Log
 2026-05-21 — Gate 1 audit complete: 5/5 spec checks pass on static read, 1 fix applied (misleading ImageData byte-order comment in main.js), token bumped to f5dcb003. Assumptions #1–#2 advanced; #3 needs user; #4–#5 deferred to later phases.
 2026-05-21 — V1 scoped, PM-subagent dispatch agreed, five assumptions surfaced as PM's gate-1 audit list.
+2026-05-21 — Studio integration complete: studio at `v1/studio.html`, receiver at `v1/src/live.js`, LIVE button + cross-link in iconbar, preset selector with 4 presets in studio. Cache-bust token rotated to `facc7321`. See `.deban/roles/dev.md` for the decision table.
+
+## Studio integration — what was NOT built
+- **Decision-point 4 v2 forward-compat** (per STUDIO_INTEGRATION §7.4): the receiver leaves a `// v2:` marker at the M/N apply site in `v1/src/live.js`. No actual bank-index mapping was written — when the FEM mode bank lands, the marker site is where `centroid`/`bass` get mapped onto bank-index space. This is deliberately deferred.
+- **Path A (uploaded audio FFT pipeline)** and **Path B (`v3/ingest_youtube.py`)** from the v3 row remain unbuilt. The generative studio is a *third* path delivered ahead of both.
+- **Dead-channel hold (spec §5 "guard against a dead channel")**: not explicitly coded. If the studio tab closes mid-session, the cymatics tab will simply hold whatever M/N/J/S last arrived because the receiver only writes on message receipt — no timer to detect silence. This satisfies the "leaves the field on its last state, not blanked" acceptance bullet, but no explicit watchdog was added.

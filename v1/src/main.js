@@ -2,9 +2,10 @@
 // particle integrator + ImageData renderer. Also owns the audio synth and the
 // settlement-detected "continuous play" loop.
 
-import { Particles }                from "./particles.js?v=bf1d1e72";
-import { wireUI }                   from "./ui.js?v=bf1d1e72";
-import { AudioEngine, drawScope, modeFrequency } from "./audio.js?v=bf1d1e72";
+import { Particles }                from "./particles.js?v=facc7321";
+import { wireUI }                   from "./ui.js?v=facc7321";
+import { AudioEngine, drawScope, modeFrequency } from "./audio.js?v=facc7321";
+import { setupLive }                from "./live.js?v=facc7321";
 
 const MAX_PARTICLES = 200000;
 
@@ -41,6 +42,10 @@ const state = {
   setFrequencyDisplay: null,
   applyMode: null,   // installed by wireUI
   sliders: null,     // installed by wireUI
+  live: false,                 // flipped by setupLive.setActive
+  liveOverrideUntil: 0,        // performance.now() ms; ui.js#commitMode writes
+                               // this when LIVE is on so the receiver yields
+                               // M/N for ~1.8s after a manual < / > tap.
 };
 
 const canvas = document.getElementById("plate");
@@ -58,7 +63,7 @@ particles.resize(state.count);
 let field = null;
 let pendingMode = null;
 
-const worker = new Worker(new URL("./worker.js?v=bf1d1e72", import.meta.url), { type: "module" });
+const worker = new Worker(new URL("./worker.js?v=facc7321", import.meta.url), { type: "module" });
 worker.onmessage = (e) => {
   const msg = e.data;
   if (msg.type === "field") {
@@ -100,8 +105,18 @@ function requestMode(m, n) {
 state.onModeChange = requestMode;
 state.onAudioToggle = (muted) => { audio.setMuted(muted); };
 
-wireUI(state, { defaultCount: DEFAULT_COUNT });
+const live = setupLive(state, audio);
+state.live = false;   // initial; live.setActive will flip it
+wireUI(state, { defaultCount: DEFAULT_COUNT, live });
 requestMode(state.m, state.n);
+
+// Forward the current ?chan= (if any) onto the studio-link href so two-tab
+// testing on a custom channel chains.
+const studioLink = document.getElementById("studio-link");
+if (studioLink) {
+  const c = new URL(location.href).searchParams.get("chan");
+  if (c) studioLink.href = "./studio.html?chan=" + encodeURIComponent(c);
+}
 
 // ImageData byte order is R,G,B,A. On little-endian (every browser target here),
 // a Uint32 view reads as 0xAABBGGRR, so the literal puts A in the high byte.
@@ -150,7 +165,7 @@ function frame(now) {
   // when both are on — settle is the more physical trigger. Both are skipped
   // while paused (no particle motion → settle would fire instantly, and
   // timer-cycling a frozen plate makes no sense).
-  if (!state.paused && state.continuous && !pendingMode && (now - lastSwapAt) > MIN_DWELL_MS) {
+  if (!state.paused && state.continuous && !pendingMode && !state.live && (now - lastSwapAt) > MIN_DWELL_MS) {
     settleSampleCounter++;
     if (settleSampleCounter >= 6) {
       settleSampleCounter = 0;
@@ -161,7 +176,7 @@ function frame(now) {
     if (settleEMA < SETTLE_THRESHOLD || dwell > MAX_DWELL_MS) {
       triggerSwap();
     }
-  } else if (!state.paused && state.autoCycle && now - autoLastSwap > 4000 && !pendingMode) {
+  } else if (!state.paused && state.autoCycle && now - autoLastSwap > 4000 && !pendingMode && !state.live) {
     triggerSwap();
     autoLastSwap = now;
   }

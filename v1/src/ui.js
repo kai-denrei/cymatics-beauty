@@ -4,10 +4,11 @@
 // speed). Icon buttons replace native toggles for pause / continuous /
 // cycle / reseed. About dialog opens on the "+" trigger.
 
-import { BrailleSlider } from "./braille-slider.js?v=bf1d1e72";
+import { BrailleSlider } from "./braille-slider.js?v=facc7321";
 
 export function wireUI(state, opts = {}) {
   const $ = (id) => document.getElementById(id);
+  const live = opts.live;
 
   const freqOut = $("freq");
 
@@ -15,6 +16,7 @@ export function wireUI(state, opts = {}) {
   const continuousBtn = $("continuous-btn");
   const cycleBtn      = $("cycle-btn");
   const reseedBtn     = $("reseed-btn");
+  const liveBtn       = $("live-btn");
   const audioBtn      = $("audio-toggle");
 
   const aboutBtn      = $("about-btn");
@@ -70,6 +72,11 @@ export function wireUI(state, opts = {}) {
   // axis's value, skip one more step in the same direction. If that's
   // out of range, revert to the prior value. No flash, no toast, no row.
   function commitMode(which, newVal) {
+    if (live?.active) {
+      // Pause the audio-driven M/N for the spec's 1.8s window so a manual
+      // < / > tap is honoured. J/S still track the stream within the window.
+      state.liveOverrideUntil = performance.now() + 1800;
+    }
     const other = which === "m" ? state.n : state.m;
     const prev  = which === "m" ? state.m : state.n;
     const slider = sliders[which];
@@ -133,6 +140,29 @@ export function wireUI(state, opts = {}) {
     reseedBtn.classList.add("pulse");
     setTimeout(() => reseedBtn.classList.remove("pulse"), 240);
   });
+
+  // --- LIVE (audio-reactive driver) ------------------------------------------
+  // ⌁ flips state.live; the live receiver in main.js gates auto-cycle/cont.
+  // off, and we disable those buttons here to make the precedence visible.
+  // Auto-mute the internal ♪ when LIVE comes on (studio is the sound source,
+  // running both produces a doubled, detuned drone). No auto-unmute on off —
+  // user owns ♪ from then on.
+  if (liveBtn && live) {
+    liveBtn.addEventListener("click", () => {
+      const on = !live.active;
+      live.setActive(on);
+      setToggle(liveBtn, on);
+      liveBtn.setAttribute("aria-label", on ? "live audio off" : "live audio on");
+      if (on && !state.audioMuted) {
+        audioBtn.click();   // share the mute path so ♪ aria-pressed stays in sync.
+      }
+    });
+
+    live.onChange((on) => {
+      continuousBtn.disabled = on;
+      cycleBtn.disabled = on;
+    });
+  }
 
   // --- Audio -----------------------------------------------------------------
   // ♪ stays as the glyph; state is conveyed by aria-pressed (color shift).

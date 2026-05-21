@@ -225,6 +225,50 @@ This needs honest handling, not silent automation:
 - [ ] `ingest_youtube.py` is opt-in, documented with the ToS caveat, never auto-runs, audio cache gitignored.
 - **Commit:** `v3: audio-reactive (file upload + optional local YouTube ingest)`.
 
+### Phase 3 — generative studio path (intermediate, shipped 2026-05-21)
+
+Ahead of Path A's uploaded-audio FFT pipeline and Path B's local YouTube
+ingest, a third path is wired in: a sibling page (`v1/studio.html`) generates
+trance/ambient/DnB beds in-engine with WebAudio, extracts the same spectral
+features an upload pipeline would, and broadcasts the resulting (M, N, J, S)
+stream to the cymatics tab over `BroadcastChannel`. v1's listener lives in
+`v1/src/live.js`; activate it with the `⌁` icon button in the cymatics tab.
+
+#### BroadcastChannel contract (verbatim per STUDIO_INTEGRATION §2)
+
+The studio posts this object every animation frame (~60 Hz) on
+`BroadcastChannel('cymatics')` (channel name overridable per-tab with
+`?chan=NAME` on both URLs):
+
+```js
+{
+  type: 'cymatics',          // discriminator — ignore anything else
+  t: 1234.5,                 // performance.now() at emit
+  M: 7,  N: 3,               // mode indices, int 1..12, M !== N
+  J: 0.42,                   // jitter, 0..1
+  S: 1.18,                   // settle speed, 0.1..3
+  beat: true,                // kick onset this frame
+  reseed: false,             // true once per bar (every 4th beat)
+  rms: 0.31,                 // loudness 0..1
+  bass: 0.55, mid: 0.20, treble: 0.08,  // band energy 0..1
+  centroid: 0.34             // spectral brightness 0..1
+}
+```
+
+One-way only: the cymatics tab never talks back. The receiver clamps `M ≠ N`
+defensively even though the emitter already enforces it.
+
+#### Membrane-cheat caveat (per STUDIO_INTEGRATION §1.2)
+
+The studio's feature→mode mapping is a *cheat keyed to the membrane
+approximation*, exactly like v1's tone. `(M, N)` are picked by binning
+spectral centroid + bass energy onto the 1..12 grid the v1 toy field expects;
+they are not derived from real plate eigenfrequencies. When v2's
+`scikit-fem` mode bank lands, the same contract re-targets — `(M, N)` become
+**bank indices**, and `live.js` maps `centroid`/`bass` onto bank-index space
+at the `// v2:` marker. Do not "improve" the studio's `mapToField` by
+reaching into the FEM solver — the two stay decoupled by design.
+
 ---
 
 ## Appendix A — physics reference (so v2 never regresses to a membrane)

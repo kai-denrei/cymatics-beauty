@@ -6,7 +6,7 @@ An interactive cymatics tool, built honestly in three stages.
 |---|---|---|
 | **v1** | A vanilla HTML5 + Canvas2D toy. Square-membrane superposition. Fast and pretty, *and labelled in code as the physics cheat.* | In progress |
 | **v2** | The real one — a `scikit-fem` biharmonic eigensolve on a Kirchhoff–Love plate with free-edge BC. Emits a mode bank that v1 can load. | Planned |
-| **v3** | Audio-reactive — uploaded tracks first, optional local YouTube ingest behind a CLI flag. | Planned |
+| **v3** | Audio-reactive — uploaded tracks first, optional local YouTube ingest behind a CLI flag. | In progress (generative studio path live — see [`v1/studio.html`](./v1/studio.html)) |
 
 The full build spec lives in [`CYMATICS_BUILD.md`](./CYMATICS_BUILD.md).
 The "one distinction that governs everything" — plate vs membrane vs Faraday

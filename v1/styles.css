@@ -496,3 +496,17 @@ dialog.about::backdrop {
   .glossary { grid-template-columns: 1fr; gap: 2px; }
   .glossary dt { margin-top: 8px; }
 }
+
+/* ── LIVE / studio-link integration ────────────────────────────────────── */
+/* Disabled state for icon buttons gated off by LIVE (∞ and ↻ during a
+   live session). pointer-events:none also stops :hover from re-tinting them
+   teal, which would falsely suggest they're clickable. */
+.icon-btn:disabled,
+.icon-btn[disabled] {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* The studio-link is an <a> styled as .icon-btn; kill the default underline. */
+a.icon-btn { text-decoration: none; }
