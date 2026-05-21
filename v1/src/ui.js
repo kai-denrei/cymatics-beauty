@@ -9,7 +9,6 @@ import { BrailleSlider } from "./braille-slider.js?v=5890bbbd";
 export function wireUI(state, opts = {}) {
   const $ = (id) => document.getElementById(id);
 
-  const mnWarn  = $("mn-warn");
   const freqOut = $("freq");
 
   const pauseBtn      = $("pause-btn");
@@ -55,19 +54,43 @@ export function wireUI(state, opts = {}) {
   state.sliders = sliders;
 
   // --- Mode application (m/n shared path) ------------------------------------
-  // applyMode is also called by main.js triggerSwap() for programmatic swaps,
-  // and by manual user clicks via the slider onChange handlers below. Both
-  // paths land here so the side effects (mn-warn, requestMode) fire once.
+  // Manual user clicks land here via the onChange handlers below; triggerSwap
+  // in main.js calls applyMode directly with values guaranteed-not-equal by
+  // randomMode(). No collision branch needed.
   state.applyMode = (m, n) => {
     state.m = m;
     state.n = n;
-    const collide = m === n;
-    mnWarn.hidden = !collide;
-    if (!collide) state.onModeChange?.(m, n);
+    state.onModeChange?.(m, n);
   };
 
-  sliders.m.onChange((v) => state.applyMode(v, state.n));
-  sliders.n.onChange((v) => state.applyMode(state.m, v));
+  // M ≠ N is enforced silently: if the user's < / > would land on the other
+  // axis's value, skip one more step in the same direction. If that's
+  // out of range, revert to the prior value. No flash, no toast, no row.
+  function commitMode(which, newVal) {
+    const other = which === "m" ? state.n : state.m;
+    const prev  = which === "m" ? state.m : state.n;
+    const slider = sliders[which];
+
+    let target = newVal;
+    if (target === other) {
+      const dir = target >= prev ? 1 : -1;
+      const skipped = target + dir;
+      if (skipped >= slider.min && skipped <= slider.max && skipped !== other) {
+        target = skipped;
+      } else {
+        // Out of range or also collides: stay put.
+        slider.setValue(prev, { silent: true });
+        return;
+      }
+      slider.setValue(target, { silent: true });
+    }
+
+    if (which === "m") state.applyMode(target, state.n);
+    else               state.applyMode(state.m, target);
+  }
+
+  sliders.m.onChange((v) => commitMode("m", v));
+  sliders.n.onChange((v) => commitMode("n", v));
 
   sliders.count.onChange((v) => { state.count = v; });
   sliders.temp.onChange((v)  => { state.temperature = v; });
@@ -143,5 +166,4 @@ export function wireUI(state, opts = {}) {
   state.continuous  = false;
   state.paused      = false;
   state.audioMuted  = true;
-  mnWarn.hidden = (state.m !== state.n);
 }
