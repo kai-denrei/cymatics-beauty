@@ -1,0 +1,8 @@
+{
+  "schema": "cymatics-studio.preset/1",
+  "id": "ambient-72",
+  "label": "Ambient — slow",
+  "bpm": 72,
+  "palette": "kick:  x ~ ~ ~ ~ ~ ~ ~  x ~ ~ ~ ~ ~ ~ ~\nohh:   ~ ~ ~ ~ ~ ~ x ~  ~ ~ ~ ~ ~ ~ x ~\nchord: c3+e3+g3+b3  c3+e3+g3+b3  a2+c3+e3+g3  a2+c3+e3+g3  /16\nbass:  ~ ~ ~ ~  c2 ~ ~ ~  ~ ~ ~ ~  a1 ~ ~ ~\nlead:  ~ ~ ~ ~  ~ ~ g5 ~  ~ ~ ~ ~  ~ ~ e5 ~",
+  "arrangement": "@length 64\n0   section drift\n0   in chord\n0   fx chord reverb 0.7\n16  section pulse\n16  in kick\n16  in ohh\n32  section weight\n32  in bass\n48  section voice\n48  in lead\n56  filter 2200 6"
+}

@@ -1,0 +1,37 @@
+{
+  "schema": "cymatics-studio.preset/1",
+  "id": "greensleeves-essence",
+  "label": "Greensleeves — melody & drone",
+  "bpm": 92,
+
+  "palette": "# Greensleeves — ESSENCE PORTRAIT (melody + drone, almost no beat)\n# D dorian. The melody IS the piece. B natural = the haunting raised-6th color.\n# NO kick/hat/clap/arp/chord-stabs — their absence is the point.\n# 'drone' aliased to 'chord' (sustained voice); 'heart' aliased to 'kick'\n# (only x-token voice). See meta.originalInstruments.\nlead: d4 f4 g4 ~ a4 b4 a4 g4 f4 d4 e4 ~ c4 d4 e4 ~ d4 f4 g4 ~ a4 b4 a4 g4 f4 e4 d4 c4 d4 ~ ~ ~ a4 c5 ~ c5 c5 b4 a4 g4 f4 d4 e4 ~ c4 d4 e4 ~ a4 c5 ~ c5 c5 b4 a4 g4 f4 e4 d4 c4 d4 ~ ~ ~ /4\n# static open-fifth drone underneath (bagpipe/old-world). unchanging = haunting.\nchord: d3+a3 d3+a3 d3+a3 d3+a3 d3+a3 d3+a3 d3+a3 d3+a3 d3+a3 d3+a3 d3+a3 d3+a3 d3+a3 d3+a3 d3+a3 d3+a3 /16\n# 'heart': near-absent pulse, one soft hit per 4 bars. mostly kept OUT by the arrangement.\nkick: x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ /16",
+
+  "arrangement": "@length 32\n\n0   section solo            ; melody alone over the bare drone — the sigh, exposed\n0   in chord\n2   in lead\n\n16  section second-verse    ; the same melody restates. NO new layers — restraint.\n16  gain lead 1 0\n# the faintest pulse enters for the refrain, then leaves.\n20  in kick\n28  out kick\n# loop: melody simply returns. there is no 'drop'. the form is statement -> rest -> restatement.",
+
+  "meta": {
+    "title": "Greensleeves (essence portrait)",
+    "essence": "THE MELODY. A simple rise-and-fall contour that sighs: it climbs to the dorian 6th (B natural — the haunting 'old-world' color) and falls back stepwise, twice, the refrain leaping to a high C. Everything else exists only to frame that line.",
+    "tuneOrigin": "Traditional English, 16th c. — PUBLIC DOMAIN composition.",
+    "harmonySource": "contour faithful to greensleeves_guitar.ly (Mutopia, CC-BY-SA); pitch sequence is the essence, not the engraving.",
+    "key": "D", "mode": "dorian", "loopBars": 16, "arrangementBars": 32,
+    "designPrinciple": "ESSENCE-FIRST, NOT TEMPLATE. This preset deliberately has NO four-on-the-floor kick, NO hats, NO claps, NO arp, NO chord stabs. Those are the generic techno scaffold that made the earlier version sound like everything else. Here the skeleton is just: melody (dominant) + a static open-fifth drone + an almost-absent pulse.",
+    "originalInstruments": {
+      "drone": "Renamed to 'chord' here — the studio's chord voice IS a sustained supersaw pad and accepts chord tokens (note+note). Intended timbre is a static open-fifth drone (bagpipe-like).",
+      "heart": "Renamed to 'kick' here — the studio's only x-token voice. The intended sound is a soft, near-absent pulse; the arrangement keeps it OUT for most of the piece and only fades it in briefly for the refrain.",
+      "timbreNote": "IDEAL melody timbre for 'lead' is pure and plaintive (soft sine/triangle, recorder/flute-like), NOT a bright supersaw. The studio's supersaw 'lead' will undercut the sadness. Flagged as a synth-voice task."
+    }
+  },
+
+  "essenceNotes": {
+    "whatChangedVsFailedVersion": "Earlier version buried the melody under a generic arp + four-on-floor + chord stabs, so it sounded like the techno template. Now the melody is the loudest/longest/most-detailed track; harmony is a single static drone; the beat is essentially gone.",
+    "whyDroneNotChords": "A static open-fifth drone is the authentic Renaissance/modal frame and stays out of the melody's way. Rhythmic chord stabs would impose a groove the tune doesn't want.",
+    "whyNoArp": "An arp is busy-work that competes with a melody. A melody-essence piece must not have one.",
+    "cymaticsCoupling": "Sparse spectrum + slow melody = a calm, low-mode field that shifts gently with each melodic phrase and brightens on the refrain's high C. The visual is meditative, not pulsing — matching the music."
+  },
+
+  "caveats": {
+    "meter": "Greensleeves is 3/4 (felt 6/8). Mapped to 4/4 with a 4th-beat breath per bar — which actually helps the 'sigh'. True triple meter needs a triplet/12-step grid (engine change).",
+    "tempo": "~92 BPM — slow, song-like. NOT dance tempo. Genre be damned, per the brief.",
+    "contourFidelity": "Pitch sequence is faithful to the recognizable tune's contour; exact rhythmic values are simplified to the grid."
+  }
+}

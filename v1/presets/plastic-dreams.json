@@ -1,0 +1,46 @@
+{
+  "schema": "cymatics-studio.preset/1",
+  "id": "plastic-dreams",
+  "label": "Plastic Dreams homage — 92 organ house",
+  "bpm": 128,
+  "palette": "# Plastic Dreams homage — DEVELOPED (organ riff dense & syncopated)\n# drums + seed-style lines are 1-bar (16, repeat); bass/organ VARY over 4 bars (64).\n# 'organ' is aliased to 'lead' in this build — see meta.organNote.\nkick:  x ~ ~ ~  x ~ ~ ~  x ~ ~ ~  x ~ ~ ~\nchh:   ~ ~ x ~  ~ ~ x ~  ~ ~ x ~  ~ ~ x ~\nohh:   ~ x ~ ~  ~ x ~ ~  ~ x ~ ~  ~ x ~ ~\nclap:  ~ ~ ~ ~  x ~ ~ ~  ~ ~ ~ ~  x ~ ~ ~\nchord: c3+eb3+g3  c3+eb3+g3  bb2+d3+f3  g2+bb2+d3  /16\nbass:  c2 ~ c2 ~ g1 ~ g1 ~ c2 ~ c2 ~ g1 ~ g1 ~ bb1 ~ bb1 ~ f1 ~ f1 ~ g1 ~ g1 ~ d1 ~ d1 ~  /2\nlead:  c4 eb4 g4 c5 bb4 g4 eb4 g4 c5 bb4 g4 c5 eb4 d4 c4 ~ c4 g4 eb4 c4 d4 eb4 g4 bb4 c5 bb4 g4 eb4 g4 f4 eb4 d4 d4 f4 bb4 d5 c5 bb4 f4 d4 bb3 d4 f4 bb4 f4 d4 c4 ~ g4 bb4 d5 g5 f5 d5 bb4 g4 d4 g4 bb4 d5 bb4 g4 f4 ~  /1",
+  "arrangement": "@length 64\n\n0   section seed                 ; STATE A — bare groove, sparse organ\n0   in kick\n0   in bass\n4   in ohh\n\n8   section groove\n8   in clap\n# 'organ' interpolation stages — each is a 'set lead ...' frame (organ aliased to lead).\n# Sparse stages are 1-bar (16) loops by design; the final full frame is the 4-bar (64) phrase.\n12  set lead c4 ~ eb4 ~ g4 ~ ~ ~ c4 ~ bb3 ~ g3 ~ ~ ~ /1        ; stage 0 (seed, 1-bar loop)\n\n16  section interp-1\n16  in chord\n16  set lead c4 ~ eb4 g4 ~ bb4 ~ ~ c4 ~ bb3 g3 ~ eb4 ~ ~ /1   ; stage 1: gaps filling (1-bar)\n\n24  section interp-2\n24  in chh\n24  set lead c4 eb4 g4 ~ bb4 g4 ~ eb4 c5 ~ bb4 g4 f4 ~ eb4 ~ /1 ; stage 2: rolling (1-bar)\n\n32  section full                                                ; STATE B — full 4-bar improvised riff\n32  set lead c4 eb4 g4 c5 bb4 g4 eb4 g4 c5 bb4 g4 c5 eb4 d4 c4 ~ c4 g4 eb4 c4 d4 eb4 g4 bb4 c5 bb4 g4 eb4 g4 f4 eb4 d4 d4 f4 bb4 d5 c5 bb4 f4 d4 bb3 d4 f4 bb4 f4 d4 c4 ~ g4 bb4 d5 g5 f5 d5 bb4 g4 d4 g4 bb4 d5 bb4 g4 f4 ~ /1\n32  set bass  c2 ~ c2 ~ g1 ~ g1 ~ c2 ~ c2 ~ g1 ~ g1 ~ bb1 ~ bb1 ~ f1 ~ f1 ~ g1 ~ g1 ~ d1 ~ d1 ~ /2\n\n44  section breakdown\n44  out kick\n44  out clap\n44  filter 900 6\n# 'organ' keeps rolling alone over the filtered pad — the 'jazzy interlude'\n\n54  section riser\n54  riser 8\n54  filter 18000 4\n58  in kick\n58  in clap\n# bar 64 loops -> full groove + dense organ slams back = the drop\n# NET EFFECT: organ riff interpolates seed->dense across bars 12->32, exactly the\n# slow-unfurling 'improvised' build the original rides for ~10 minutes.",
+
+  "meta": {
+    "title": "Plastic Dreams (homage)",
+    "inspiration": "Jaydee — 'Plastic Dreams' (1992, R&S Records). Robin Albers / DJ Jaydee.",
+    "COPYRIGHT_NOTE": "Plastic Dreams is a COPYRIGHTED 1992 work, NOT public domain (unlike the Chaconne / Greensleeves presets). This preset does NOT transcribe Albers's organ riff. It reproduces only (a) the generic four-on-the-floor house drum convention, which is an uncopyrightable genre idiom, and (b) an ORIGINAL rolling-organ pattern written to evoke the jazzy/improvised Hammond CHARACTER described in sources — not its melody. Treat as 'in the spirit of', a homage, not a copy. If shipping publicly, label it as inspired-by, not a cover.",
+    "key": "C",
+    "mode": "minor / dorian-pentatonic feel",
+    "loopBars": 4,
+    "arrangementBars": 64,
+    "timeFeel": "4/4 straight, house. Swing optional (engine has no swing).",
+    "signatureElement": "rolling, syncopated organ riff over a stripped four-on-the-floor",
+    "organNote": "The studio engine has no 'organ' voice — this preset aliases 'organ' to 'lead' (the studio's brightest sustained synth). The riff is the point; the timbre name is not. The dense-rolling lead line is intentionally voiced as a supersaw-on-the-lead bus; getting closer to a Hammond drawbar would need a synth-design change in the voice code."
+  },
+
+  "_paletteInitial_kept_for_reference": "kick:  x ~ ~ ~  x ~ ~ ~  x ~ ~ ~  x ~ ~ ~\nohh:   ~ ~ x ~  ~ ~ x ~  ~ ~ x ~  ~ ~ x ~\nclap:  ~ ~ ~ ~  x ~ ~ ~  ~ ~ ~ ~  x ~ ~ ~\nbass:  c2 ~ ~ ~  c2 ~ ~ ~  c2 ~ ~ ~  c2 ~ ~ ~  /1\nlead:  c4 ~ eb4 ~  g4 ~ ~ ~  c4 ~ bb3 ~  g3 ~ ~ ~  /1",
+
+  "harmonyReference": {
+    "tonalCenter": "C minor / C dorian (the riff leans on c eb g bb, with d and f as passing/dorian color)",
+    "chordLoop4bar": ["Cm", "Cm", "Bb", "Gm"],
+    "voicings": {"Cm": "c eb g", "Bb": "bb d f", "Gm": "g bb d"},
+    "organPitchSet": "c eb f g bb (+ passing d) — C minor pentatonic with a dorian-ish 6th flavor",
+    "bassMove": "root pulse on the seed (c every beat), opening to c-g-bb-g walk in the developed state"
+  },
+
+  "interpolationModel": {
+    "what": "Two palette STATES (initial seed A, developed B) plus an arrangement that linearly swaps the organ pattern through intermediate densities (stage 0->1->2->full).",
+    "knob": "The 'set lead ...' lines at bars 12/16/24/32 are the interpolation frames. Add or remove frames to make the morph slower/faster.",
+    "why_set_not_crossfade": "The studio mutates patterns discretely on bar boundaries, so interpolation is stepped (4 stages), not continuous.",
+    "alt_continuous": "True continuous interpolation (probabilistic note-density ramp) would need an engine feature: a per-track 'density' param 0..1 that stochastically gates steps. NOT built; flagged as a possible studio enhancement."
+  },
+
+  "caveats": {
+    "copyright": "See meta.COPYRIGHT_NOTE. Original work is under copyright; this is an inspired-by homage. Do not market as a cover/transcription.",
+    "keyAmbiguity": "Catalog sites disagree (C major vs minor). The hook reads dark/minor; this preset commits to C minor. For the brighter reading, raise eb->e and bb->b in lead/chord.",
+    "swing": "House sits slightly behind the grid. The studio's straight 16th grid can't swing without a transport feature.",
+    "organTimbre": "Hammond/jazz-organ tone is a SYNTH-VOICE concern, not a pattern concern. Pattern captures the rhythm/notes; matching the timbre is a voice-design task in the studio.",
+    "cymaticsCoupling": "The seed->dense organ interpolation steadily raises mid/treble energy and note rate, so the cymatics field tightens and climbs through the build automatically."
+  }
+}

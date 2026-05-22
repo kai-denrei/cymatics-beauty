@@ -1,0 +1,51 @@
+{
+  "schema": "cymatics-studio.preset/1",
+  "id": "purayumesurii",
+  "label": "PuraYumeSurii — blues + elbow (129)",
+  "bpm": 129,
+
+  "palette": "# PuraYumeSurii — Plastic Dreams essence portrait, 3rd pass\n# Pitches + production facts from a deconstruction video: TX81Z FM organ\n# (lpf + delay + reverb), 909 kick, 606 hats, an accidental low 'elbow' loop.\n# Vocabulary IS the C BLUES scale (C Eb F F# G Bb) — not plain C minor.\n# 'organ' aliased to 'lead'; 'elbow' aliased to 'bass' (low percussive belly);\n# 'gong' kept by name and silent until a gong voice exists. See meta.\n# !! Hand-played / UNQUANTIZED is the source's essence — the studio's 16th grid\n# can't reproduce that yet. See meta.NO_QUANTIZE_REQUIREMENT. !!\nkick: x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ /1\n# spine: deep blues riff. primary melodic element.\nlead: c2 ~ ~ ~  eb2 eb2 ~ ~  f2 ~ fs2 ~  eb2 c2 ~ ~ c2 ~ c2 ~  eb2 ~ ~ ~  f2 ~ ~ ~  ~ ~ ~ ~ c2 ~ ~ ~  eb2 f2 fs2 ~  g2 ~ f2 ~  eb2 ~ ~ ~ c2 ~ c2 ~  eb2 eb2 ~ ~  f2 ~ ~ ~  ~ ~ ~ ~ /1\n# the 'elbow': accidental low-key loop (belly bit), runs THROUGHOUT.\n# played on 'bass' voice — its low-register sawtooth + resonant LPF approximates\n# the JD-800-ish 'belly + click' character described in the source.\nbass: c1 ~ ~ c1 ~ ~ c1 ~ c1 ~ ~ c1 ~ ~ c1 ~ c1 ~ ~ c1 ~ ~ c1 ~ c1 ~ ~ c1 ~ ~ c1 ~ c1 ~ ~ c1 ~ ~ c1 ~ c1 ~ ~ c1 ~ ~ c1 ~ c1 ~ ~ c1 ~ ~ c1 ~ c1 ~ ~ c1 ~ ~ c1 ~ /1\n# rare gong punctuation (silent until gong voice exists).\ngong: x ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ /1\n# hats = TR-606 in source. sparse + late, never busy.\nchh: ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ /1",
+
+  "arrangement": "@length 64\n\n0   section call            ; gong + low blues riff + 909 kick + elbow loop\n0   in gong\n0   in kick\n0   in lead\n0   in bass\n# broods LOW on the blues scale. constant small variation, never a dead-repeat loop.\n\n16  section reach-1         ; riff reaches up — fifth (g), b7 (bb), octave enter. VARY, don't layer.\n16  set lead c2 ~ f2 ~  fs2 ~ g2 ~  bb2 ~ g2 ~  f2 eb2 ~ ~ c2 ~ g2 ~  c3 ~ bb2 ~  g2 ~ fs2 ~  f2 ~ eb2 ~ c2 ~ ~ ~  eb2 f2 fs2 g2  bb2 ~ ~ ~  g2 ~ f2 ~ c2 ~ f2 ~  fs2 ~ eb2 ~  c2 ~ g2 ~  c3 ~ ~ ~ /1\n\n32  section reach-2         ; gong returns; soaring blues flurries\n32  in gong\n\n48  section reach-3         ; 606 hat enters soft; fifths + pitch-bend feel up top\n48  in chh\n48  gain chh 0.45 4\n# loop: back to low brood. no drop. kept alive by VARYING the riff, not adding drama.\n# REMINDER: humanize organ timing (no-quantize) or the hypnotism is only half-present.",
+
+  "meta": {
+    "title": "Plastic Dreams (essence portrait, blues + elbow)",
+    "essence": "ONE deep organ riff played on the C BLUES SCALE (C Eb F F# G Bb), hand-played and DELIBERATELY UNQUANTIZED (slightly off-grid), over layered classic drum machines and an accidental looping 'elbow' bass texture. Hypnotic via constant riff VARIATION, not a single repeated loop. Form: broods low (oct 2) then reaches up using fifths + the octave.",
+    "inspiration": "Jaydee — 'Plastic Dreams' (1992). COPYRIGHTED work; this is an inspired-by homage using the generic four-on-floor idiom + an ORIGINAL circling riff evoking the deep-organ character, NOT a transcription.",
+    "sourceOfTruth": "Pitches/register from a user Ableton screenshot (C2/D#2/F2/F#2, 129 BPM, 16-bar). Production facts from a deconstruction video: TX81Z FM organ (lpf+delay+reverb); 909 kick+clap, 606 hats, 808 cymbal/maracas; hip-hop breaks (EQ'd/HPF'd); blues-scale riffs; NO quantization (off-grid by intent); riffs constantly varied; accidental 'elbow' low-key loop (belly bit, ~JD-800); fifths + pitch-bend(4) later.",
+    "key": "C", "mode": "minor", "scale": "C blues (C, Eb, F, F#, G, Bb) — NOT plain C minor. The F#(#4/b5) is the blues hook.",
+    "loopBars": 4, "arrangementBars": 64,
+    "pitchSet": "C blues: c2 eb2 f2 fs2 g2 bb2 (+ reach c3 eb3 f3 fs3). Riff vocabulary = this scale.",
+    "designPrinciple": "ESSENCE-FIRST, NOT TEMPLATE. RESTRAINT IS THE RULE. Only kick + the single organ riff + the elbow loop + a rare gong. NO chord stabs, NO arp, NO busy hats, NO section-swap drama. Evolution happens INSIDE the riff via slow mutation, not by adding tracks.",
+    "originalInstruments": {
+      "organ": "Renamed to 'lead' — the engine has no organ voice. Intended timbre: Yamaha TX81Z FM (4-op), low-pass filtered, delay + reverb. FM not subtractive — model with a 2-op FM voice if possible; the studio's supersaw is wrong.",
+      "elbow": "Renamed to 'bass' — its sawtooth + resonant LPF in the low register approximates the JD-800-ish 'belly body + rhythmic click' character of the source's accidental loop. JayDee knocked the lowest synth key with his elbow reaching for a drink, liked it, looped it for the whole track.",
+      "gong": "Track kept by name; silent until a gong voice exists. 'in gong' cues are no-ops for now.",
+      "kick_clap_hats": "Source uses 909 kick, 909 clap, 606 hats, 808 cymbal/maracas. The engine's generic 'kick' / 'chh' / 'clap' voices stand in; voice-design task, flagged."
+    },
+    "NO_QUANTIZE_REQUIREMENT": "CRITICAL: the source riff must NOT sit perfectly on the grid. JayDee refused to quantize and that off-grid humanity is THE defining feature (labels called it 'wrong'; it is why the track endures). The studio's rigid 16th grid quantizes everything = it CANNOT reproduce the essence as-is. Needs a per-note timing-jitter / swing-humanize feature (offset each onset by a few ms, randomized). Until then this preset is structurally faithful but rhythmically TOO CLEAN. This is the #1 engine requirement for this piece.",
+    "accidentalReminder": "eb2 = D#2 ; fs2 (or f#2) = F#2."
+  },
+
+  "essenceNotes": {
+    "bluesScaleCorrection": "The four screenshot notes C/Eb/F/F# are the first four degrees of the C BLUES scale, not 'C minor with a chance tritone'. The riff vocabulary IS the blues scale; later sections add the 5th (G), b7 (Bb), and the octave for the soaring runs. Generative variation = move within C blues, not C minor.",
+    "theElbow": "A genuine accident: JayDee knocked the lowest synth key with his elbow reaching for a drink, liked the rhythmic low 'belly' texture, and looped it for the whole track. It is a co-equal spine with the drums and organ. Modeled here as a low irregular pulse on the bass voice.",
+    "humanity": "The no-quantize, hand-played, off-grid timing is the track's most defining trait. A perfectly gridded rendition is — by the creator's own logic — a failure. See NO_QUANTIZE_REQUIREMENT.",
+    "cymaticsCoupling": "A near-static spectrum dominated by one low-mid riff + a low rhythmic pulse = a steady, slowly-breathing field that shifts subtly as the riff varies. The visual hypnotism mirrors the musical hypnotism — exactly because nothing busy is competing."
+  },
+
+  "caveats": {
+    "copyright": "Original is copyrighted; this reproduces only the generic four-on-floor idiom + an ORIGINAL riff evoking the character. Homage, not cover.",
+    "quantization": "The studio quantizes to a 16th grid; the source's essence is the REFUSAL to quantize. This preset is rhythmically too clean until a humanize/timing-jitter feature exists. Engine requirement #1 for this piece.",
+    "tempoTrick": "The fast organ runs may have been recorded at ~60 BPM and sped up. The grid can approximate density but not that performance nuance.",
+    "restraintIsFragile": "Resist the urge to 'improve' this by adding parts. If it starts sounding busy, the essence is lost. Any addition must be tiny and late."
+  },
+
+  "lessonsForSkill": [
+    "Production research can OVERTURN a transcription's interpretation: the same four notes are 'C minor + odd note' or 'C blues scale' depending on context — and the latter gives the correct generative vocabulary. Always seek the scale/intent, not just the pitches.",
+    "Some essences are PERFORMANCE, not notes: no-quantize humanity, accidental textures (the elbow), tempo tricks. Capture them as explicit engine requirements + documented intent, never silently quantize them away.",
+    "When a transcription source exists (screenshot/MIDI/score), READ IT — do not harmonize from theory. Register and the 'wrong' note are often the essence.",
+    "Accidental textures count as essence. The elbow loop is not garnish — it is one of three co-equal spines (kick / organ / elbow). Preserve it as a first-class track, not as a nice-to-have.",
+    "Signature timbre is a separate task: TX81Z FM organ, JD-800 elbow body, TR-909/606/808 drums. Pattern + scale captured here; voice-design flagged."
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "schema": "cymatics-studio.preset/1",
+  "id": "gm-trance",
+  "label": "G-minor trance (Strudel-style)",
+  "bpm": 138,
+  "palette": "# G minor\nkick:  x ~ ~ ~  x ~ ~ ~  x ~ ~ ~  x ~ ~ ~\nclap:  ~ ~ ~ ~  x ~ ~ ~  ~ ~ ~ ~  x ~ ~ ~\nchh:   ~ ~ x ~  ~ ~ x ~  ~ ~ x ~  ~ ~ x ~\nohh:   ~ ~ ~ ~  ~ ~ x ~  ~ ~ ~ ~  ~ ~ x ~\nbass:  ~ g1 g1 g1  ~ bb1 bb1 bb1  ~ eb2 eb2 eb2  ~ d2 d2 d2\nchord: g3+bb3+d4  eb3+g3+bb3  bb3+d4+f4  f3+a3+c4  /16\narp:   g4 d5 bb4 d5  eb4 bb4 g4 bb4  bb4 f5 d5 f5  f4 c5 a4 c5\nlead:  ~ /16",
+  "arrangement": "@length 64\n0   section intro\n0   in kick\n4   in chh\n8   in ohh\n12  section build\n12  in bass\n12  in clap\n20  in chord\n24  in arp\n32  section peak\n32  clone bass lead 12\n32  in lead\n36  fx lead delay 0.55\n40  euclid kick 11 16\n48  section breakdown\n48  out kick\n48  out clap\n48  out arp\n48  filter 1000 6\n56  section riser\n56  riser 8\n60  filter 18000 4"
+}

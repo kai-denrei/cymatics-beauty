@@ -4,7 +4,7 @@
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0d0d0f">
 <meta name="cb" content="89493e79">
-<title>studio2 — cymatics performance view</title>
+<title>studio3 — cymatics mixer view</title>
 <style>
   :root{
     --bg:#0d0d0f; --panel:#141418; --panel2:#101013; --line:#26262d;
@@ -38,95 +38,50 @@
   .hdr-link{color:var(--teal); text-decoration:none; font-size:11px}
   .hdr-link.dim{color:var(--dim)}
 
-  main{display:grid; grid-template-columns:2fr 1fr; gap:1px; background:var(--line); height:calc(100vh - 49px); overflow:hidden}
-  @media (max-width:820px){ main{grid-template-columns:1fr; height:auto} }
-  .pane{background:var(--bg)}
-  .pane-canvas{padding:14px; display:flex; align-items:center; justify-content:center; overflow:hidden}
-  .pane-info{padding:12px 14px; overflow-y:auto}
+  main{display:flex; flex-direction:column; gap:1px; background:var(--line); height:calc(100vh - 49px); overflow:hidden}
+  .pane{background:var(--bg); padding:12px 16px; overflow-y:auto}
+  .pane.roll-pane{padding:14px 16px 10px}
+  .pane.bottom{display:flex; gap:14px; align-items:stretch; overflow-y:auto; padding:10px 16px 14px}
+  @media (max-width:820px){ .pane.bottom{flex-direction:column} }
 
-  /* The 2/3 preview canvas — fills the left pane as a square fitting both dims. */
-  canvas#cv{width:auto; height:auto; max-width:100%; max-height:100%; aspect-ratio:1/1;
-    display:block; background:#08080a; border:1px solid var(--line); border-radius:8px}
+  canvas#roll{display:block; width:100%; height:280px; background:#08080a; border:1px solid var(--line); border-radius:8px}
 
-  .nowbar{font-family:var(--mono); font-size:13px; color:var(--dim); margin-bottom:12px; padding:7px 10px; background:var(--panel2); border:1px solid var(--line); border-radius:6px}
+  .nowbar{font-family:var(--mono); font-size:13px; color:var(--dim); margin:10px 0 6px; padding:6px 10px; background:var(--panel2); border:1px solid var(--line); border-radius:6px}
   .nowbar b{color:var(--amber); font-size:16px; font-family:var(--serif)}
   .nowbar .pct{color:var(--amber); font-family:var(--mono); font-size:12px}
   .nowbar .sec{color:var(--teal); font-weight:600}
   .beat{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--faint); margin-left:6px; vertical-align:middle}
   .beat.on{background:var(--hot); box-shadow:0 0 8px var(--hot)}
 
-  .grid{display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:12px}
-  .cell{background:var(--panel); border:1px solid var(--line); border-radius:5px; padding:5px 7px}
-  .cell .k{color:var(--dim); font-size:9px; text-transform:uppercase; letter-spacing:.5px}
-  .cell .v{font-size:15px; font-family:var(--serif); margin-top:1px}
-  .cell .v.amber{color:var(--amber)} .cell .v.teal{color:var(--teal)}
+  .label-mini{font-family:var(--serif); font-size:11px; color:var(--dim); margin:0 0 6px; text-transform:uppercase; letter-spacing:.7px}
 
-  .label-mini{font-family:var(--serif); font-size:11px; color:var(--dim); margin:14px 0 6px; text-transform:uppercase; letter-spacing:.7px}
-  .label-mini:first-of-type{margin-top:8px}
+  /* Tracks panel ---------------------------------------------------------- */
+  .tracks{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:4px}
+  .track-row{display:flex; align-items:center; gap:10px; padding:5px 8px;
+    background:var(--panel2); border:1px solid var(--line); border-radius:5px;
+    font-family:var(--mono); font-size:11px}
+  .track-row .tn{width:56px; color:var(--amber); font-weight:600; text-transform:lowercase}
+  .track-row .lab{color:var(--dim); font-size:9px; text-transform:uppercase; letter-spacing:.4px; margin-left:4px}
+  .track-row input[type=range]{width:90px}
+  .track-row .ms{display:flex; gap:4px; margin-left:auto}
+  .track-row .ms button{font-size:10px; padding:3px 7px; min-width:22px}
+  .track-row .ms button.on{background:var(--hot); color:#1a0606; border-color:var(--hot)}
+  .track-row .ms button.solo.on{background:var(--teal); color:#06120f; border-color:var(--teal)}
+  .track-row .tp{display:inline-flex; align-items:center; gap:3px}
+  .track-row .tp button{font-size:11px; padding:2px 6px; line-height:1}
+  .track-row .tp .val{color:var(--amber); min-width:22px; text-align:center; font-family:var(--mono); font-size:10px}
 
-  /* Palette display (read-only render with per-token playhead in teal) ---- */
-  .pal-display{background:var(--panel2); border:1px solid var(--line); border-radius:5px; padding:6px 8px; max-height:240px; overflow-y:auto}
-  .pal-line{font-family:var(--mono); font-size:10px; line-height:1.65; white-space:nowrap; overflow-x:auto}
-  .pal-inst{color:var(--dim); display:inline-block; width:46px}
-  .pal-toks{color:var(--ink)}
-  .pal-tok{display:inline-block; padding:0 3px; margin:0 1px; border-radius:2px;
-    transition:background-color .08s, color .08s}
-  .pal-tok.rest{color:var(--faint)}
-  .pal-tok.playing{background:var(--teal); color:#06120f; font-weight:600}
+  /* Master panel ---------------------------------------------------------- */
+  .master{flex:0 0 240px; display:flex; flex-direction:column; gap:8px;
+    background:var(--panel2); border:1px solid var(--line); border-radius:6px;
+    padding:10px 12px}
+  .master .row{display:flex; flex-direction:column; gap:3px}
+  .master .row .lab{font-size:9px; color:var(--dim); text-transform:uppercase; letter-spacing:.5px}
+  .master .row input[type=range]{width:100%}
+  .master h3{margin:0 0 4px; font-family:var(--serif); font-size:12px; color:var(--teal); text-transform:uppercase; letter-spacing:.7px; font-weight:600}
 
-  /* Arrangement display ----------------------------------------------------*/
-  .arr-display{background:var(--panel2); border:1px solid var(--line); border-radius:5px; padding:6px 6px; max-height:280px; overflow-y:auto}
-  .arr-line{font-family:var(--mono); font-size:10px; line-height:1.6; padding:1px 6px; margin:1px 0; border-radius:3px;
-    transition:background-color .12s, color .12s}
-  .arr-bar{color:var(--faint); display:inline-block; width:24px; text-align:right; margin-right:8px}
-  .arr-cmd{color:var(--amber); margin-right:6px}
-  .arr-args{color:var(--dim)}
-  .arr-line.section .arr-cmd{color:var(--teal)}
-  .arr-line.playing{background:rgba(95,179,163,0.12)}
-  .arr-line.playing .arr-bar{color:var(--teal)}
-  .arr-line.section.playing{background:rgba(95,179,163,0.30)}
-  .arr-line.section.playing .arr-cmd{font-weight:700}
-  .arr-line.section.playing .arr-args{color:var(--ink)}
-  .arr-meta{color:var(--faint); font-family:var(--mono); font-size:10px; padding:3px 6px}
-
-  /* Edit-mode textareas. Hidden by default; the EDIT button swaps the
-     display div for the matching textarea so the user can rewrite the
-     palette/arrangement in place. Clicking the button again (or Cmd+Enter)
-     parses + re-renders the display. */
-  .edit-ta{width:100%; resize:vertical; tab-size:2; font-family:var(--mono);
-    font-size:10px; line-height:1.65; color:var(--ink); background:var(--panel2);
-    border:1px solid var(--line); border-radius:5px; padding:6px 8px;
-    outline:none; caret-color:var(--amber); white-space:pre; overflow:auto}
-  .edit-ta:focus{border-color:var(--faint)}
-  #palEdit{min-height:140px; max-height:240px}
-  #arrEdit{min-height:160px; max-height:280px}
-
-  /* Inline label + edit button row */
-  .label-row{display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin:14px 0 6px}
-  .label-row:first-of-type{margin-top:8px}
-  .label-row .label-mini{margin:0}
-  .edit-btn{font-family:var(--mono); font-size:10px; color:var(--dim);
-    background:var(--panel); border:1px solid var(--line); border-radius:3px;
-    padding:3px 9px; cursor:pointer; letter-spacing:.5px; text-transform:uppercase;
-    transition:border-color .15s, color .15s, background .15s}
-  .edit-btn:hover{border-color:var(--amber); color:var(--amber)}
-  .edit-btn.editing{border-color:var(--teal); color:var(--teal); background:rgba(95,179,163,0.10)}
-
-  .edit-row{display:flex; align-items:center; gap:6px; margin:6px 0 0;
-    color:var(--faint); font-size:10px; min-height:14px}
-  .edit-row .ok{color:var(--teal)} .edit-row .bad{color:var(--hot)}
-
-  .meters{display:grid; gap:4px; margin-top:12px}
-  .meter{display:grid; grid-template-columns:48px 1fr; align-items:center; gap:6px; font-size:9px; color:var(--dim)}
-  .track{height:5px; background:var(--panel2); border:1px solid var(--line); border-radius:3px; overflow:hidden}
-  .fill{height:100%; width:0%; background:var(--teal); transition:width .05s linear}
-  .fill.bass{background:var(--amber)} .fill.tre{background:var(--hot)}
-
-  /* Braille seek slider. Variable mapping for the shared component: it expects
-     --rule / --ink-dim / --tap-min; studio2 uses --line / --dim and a compact
-     28px tap target (the index.html sliders are 36px because they live in a
-     touch-first iconbar; here the row is tighter). */
-  .seek-row{margin:0 0 12px}
+  /* Braille seek slider — same shape/CSS as studio2 ----------------------- */
+  .seek-row{margin:0 0 6px}
   .bsl{display:grid; grid-template-columns:30px 1fr 30px; gap:3px; min-width:0}
   .bsl-step{background:transparent; border:1px solid var(--line); color:var(--dim);
     font-family:var(--mono); font-size:13px; font-weight:700; line-height:1;
@@ -146,16 +101,10 @@
     background:rgba(0,0,0,0.30); overflow:hidden; min-width:0}
   .bsl-bar:focus-visible{border-color:var(--teal)}
   .bsl-bar span{display:inline-block; padding:0}
-
-  /* Headless mode parity with studio.html. studio2 isn't currently embedded
-     anywhere — kept defensively so a future ?headless=1 usage doesn't break. */
-  body.headless { background:transparent; }
-  body.headless > header,
-  body.headless > main { display:none !important; }
 </style>
 
 <header>
-  <h1>studio2<span class="dot">.</span> <span class="sub">performance view</span></h1>
+  <h1>studio3<span class="dot">.</span> <span class="sub">mixer view</span></h1>
   <div class="ctrls">
     <button id="play" class="primary">▶ play</button>
     <label class="field">preset
@@ -164,79 +113,59 @@
     <label class="field">bpm <input id="bpm" type="number" value="138" min="60" max="200"></label>
     <label class="field">vol <input id="vol" type="range" min="0" max="1" step="0.01" value="0.8"></label>
     <span class="pill">ch: <span id="chname">cymatics</span></span>
-    <!-- ↗ field reuses the same back-link semantics as studio.html: same-tab
-         navigation so we don't spawn a second cymatics page with its own
-         hidden iframe-engine (dual-broadcaster pathology — see pm.md). -->
     <a id="field-link" href="./" rel="noopener" class="hdr-link">↗ field</a>
     <a href="./studio.html" rel="noopener" class="hdr-link dim">↗ editor</a>
-    <a href="./studio3.html" rel="noopener" class="hdr-link dim">↗ mixer</a>
+    <a href="./studio2.html" rel="noopener" class="hdr-link dim">↗ perform</a>
   </div>
 </header>
 
 <main>
-  <section class="pane pane-canvas">
-    <canvas id="cv" width="900" height="900"></canvas>
-  </section>
-
-  <section class="pane pane-info">
+  <section class="pane roll-pane">
+    <canvas id="roll" width="1600" height="280"></canvas>
     <div class="nowbar">
       bar <b id="curbar">0</b>/<span id="len">64</span>
       · <span class="pct" id="curpct">0%</span>
       · <span class="sec" id="cursec">—</span>
       <span id="beatdot" class="beat"></span>
     </div>
-
-    <!-- Braille seek slider. min/max are seeded at 0/63 (matches all current
-         presets' @length 64). The format callback below reads the live `arr`
-         so a preset with a different length still labels correctly. -->
     <div id="seek-mount" class="seek-row"></div>
+  </section>
 
-    <div class="grid">
-      <div class="cell"><div class="k">M</div><div class="v amber" id="rM">–</div></div>
-      <div class="cell"><div class="k">N</div><div class="v amber" id="rN">–</div></div>
-      <div class="cell"><div class="k">J</div><div class="v teal" id="rJ">–</div></div>
-      <div class="cell"><div class="k">S</div><div class="v teal" id="rS">–</div></div>
+  <section class="pane bottom">
+    <div class="tracks">
+      <p class="label-mini">tracks · live mix</p>
+      <div id="tracksPanel"></div>
     </div>
 
-    <div class="label-row">
-      <p class="label-mini">palette · playhead in teal</p>
-      <button type="button" id="palEditBtn" class="edit-btn">edit</button>
-    </div>
-    <div id="palDisp" class="pal-display"></div>
-    <textarea id="palEdit" class="edit-ta" spellcheck="false" hidden></textarea>
-
-    <div class="label-row">
-      <p class="label-mini">arrangement · active section</p>
-      <button type="button" id="arrEditBtn" class="edit-btn">edit</button>
-    </div>
-    <div id="arrDisp" class="arr-display"></div>
-    <textarea id="arrEdit" class="edit-ta" spellcheck="false" hidden></textarea>
-    <div class="edit-row"><span id="editStatus"></span></div>
-
-    <div class="meters">
-      <div class="meter"><span>rms</span><div class="track"><div class="fill" id="mRms"></div></div></div>
-      <div class="meter"><span>bass</span><div class="track"><div class="fill bass" id="mBass"></div></div></div>
-      <div class="meter"><span>mid</span><div class="track"><div class="fill" id="mMid"></div></div></div>
-      <div class="meter"><span>treble</span><div class="track"><div class="fill tre" id="mTre"></div></div></div>
-      <div class="meter"><span>centroid</span><div class="track"><div class="fill" id="mCen"></div></div></div>
+    <div class="master">
+      <h3>master</h3>
+      <div class="row">
+        <span class="lab">filter cutoff</span>
+        <input id="mFilter" type="range" min="0" max="1" step="0.001" value="1">
+      </div>
+      <div class="row">
+        <span class="lab">reverb wet</span>
+        <input id="mRwet" type="range" min="0" max="1" step="0.01" value="0.34">
+      </div>
+      <div class="row">
+        <span class="lab">delay wet</span>
+        <input id="mDwet" type="range" min="0" max="1" step="0.01" value="0.50">
+      </div>
     </div>
   </section>
 </main>
 
-<!-- Parser-only data holders. The script's parsePalette/parseArr still read
-     from #code / #arr; they are mirrored from the visible textareas above
-     (palEdit / arrEdit) on every keystroke + on applyAll. Kept as a thin
-     shim so the studio.html-derived parser code below didn't need rewiring. -->
+<!-- Parser shim — same trick as studio2: hidden #code/#arr feed parsePalette/
+     parseArr. studio3 has no on-screen text editors; these stay as in-memory
+     storage so loadPreset / applyAll can stay unchanged. -->
 <textarea id="code" style="display:none"></textarea>
 <textarea id="arr" style="display:none"></textarea>
 
 <script type="module">
 /* =====================================================================
-   cymatics studio2 — same engine + audio + scheduler as studio.html,
-   different presentation: 2/3 canvas + read-only rendered palette /
-   arrangement with playhead highlighting. Script body is a near-verbatim
-   copy of studio.html — minimal surface area, no shared-module refactor
-   (studio.html is the "fix is shipped, don't touch" branch per pm.md).
+   cymatics studio3 — minimalist real-time mixer view.
+   Forks studio2's engine verbatim; replaces palette/arrangement text
+   panels with a piano-roll canvas + per-track gain/fx/transpose controls.
    ===================================================================== */
 import { BrailleSlider } from './src/braille-slider.js';
 const $=id=>document.getElementById(id);
@@ -249,6 +178,12 @@ function noteToFreq(s){
   let semi=SEMI[m[1].toLowerCase()];
   if(m[2]==='#'||m[2]==='s')semi++; else if(m[2]==='b')semi--;
   return 440*Math.pow(2,(12*(parseInt(m[3],10)+1)+semi-69)/12);
+}
+function noteToMidi(s){
+  const m=/^([a-gA-G])([#sb]?)(-?\d+)$/.exec(s.trim()); if(!m) return null;
+  let semi=SEMI[m[1].toLowerCase()];
+  if(m[2]==='#'||m[2]==='s')semi++; else if(m[2]==='b')semi--;
+  return 12*(parseInt(m[3],10)+1)+semi;
 }
 function parseTokens(str){
   let div=1, rest=str.trim();
@@ -284,9 +219,11 @@ function parseArr(text){
 }
 
 /* =====================================================================
-   AUDIO ENGINE  (identical to studio.html)
+   AUDIO ENGINE  (lifted from studio2 — only change: rwet/dwet hoisted
+   to module scope so the master wet knobs can write to them)
    ===================================================================== */
 let ac,master,masterFilter,analyser,reverbBus,delayBus,timeBuf,freqBuf,noiseBuf;
+let rwet, dwet;   // master wet gains — promoted from buildAudio() locals
 const SENDS={ chord:{r:.5,d:.3}, lead:{r:.4,d:.45}, arp:{r:0,d:.5}, snare:{r:.25,d:0}, clap:{r:.25,d:0} };
 
 function buildAudio(){
@@ -298,11 +235,11 @@ function buildAudio(){
   timeBuf=new Uint8Array(analyser.fftSize); freqBuf=new Uint8Array(analyser.frequencyBinCount);
 
   reverbBus=ac.createGain(); const conv=ac.createConvolver(); conv.buffer=makeIR(2.4,2.6);
-  const rwet=ac.createGain(); rwet.gain.value=0.34; reverbBus.connect(conv); conv.connect(rwet); rwet.connect(master);
+  rwet=ac.createGain(); rwet.gain.value=0.34; reverbBus.connect(conv); conv.connect(rwet); rwet.connect(master);
 
   delayBus=ac.createGain(); const dly=ac.createDelay(1.0); dly.delayTime.value=60/bpm()*0.75;
   const fb=ac.createGain(); fb.gain.value=0.36; const dlp=ac.createBiquadFilter(); dlp.type='lowpass'; dlp.frequency.value=2600;
-  const dwet=ac.createGain(); dwet.gain.value=0.5;
+  dwet=ac.createGain(); dwet.gain.value=0.5;
   delayBus.connect(dly); dly.connect(dlp); dlp.connect(fb); fb.connect(dly); dlp.connect(dwet); dwet.connect(master);
   ac._dly=dly;
 
@@ -369,6 +306,7 @@ function launchRiser(t,dur){
   o.connect(bp); bp.connect(g); g.connect(master); g.connect(delayBus); o.start(t); o.stop(t+dur+0.1);
 }
 
+const DRUMS = new Set(['kick','chh','ohh','snare','clap']);
 function trigger(tr,tok,t,dur){
   const out=tr.bus, inst=tr.inst;
   if(inst==='kick') return vKick(out,t);
@@ -396,7 +334,9 @@ function buildTracks(palette){
               base:{tokens:p.tokens.slice(), div:p.div, r:def.r, d:def.d}};
     tracks.push(tr); trackMap.set(tr.name,tr);
   }
-  paletteDirty = true;   // rebuild display from fresh tracks
+  rollDirty = true;
+  // Clear any stale mute/solo state — fresh tracks have no history.
+  mutedSet.clear(); soloName = null; preSolo.clear(); preMute.clear();
 }
 
 /* =====================================================================
@@ -417,7 +357,7 @@ function resetArrangement(time){
     tr.bus.gain.cancelScheduledValues(time); tr.bus.gain.setValueAtTime(0.0001,time);
     tr.sR.gain.setValueAtTime(tr.base.r,time); tr.sD.gain.setValueAtTime(tr.base.d,time); }
   masterFilter.frequency.cancelScheduledValues(time); masterFilter.frequency.setValueAtTime(20000,time);
-  paletteDirty = true;
+  rollDirty = true;
 }
 function applyCue(c,time){
   const a=c.args, tr=trackMap.get(a[0]), F=0.25;
@@ -425,11 +365,11 @@ function applyCue(c,time){
     case 'in':   if(tr) tr.bus.gain.setTargetAtTime(1,time,F); break;
     case 'out':  if(tr) tr.bus.gain.setTargetAtTime(0.0001,time,F); break;
     case 'gain': if(tr) rampParam(tr.bus.gain, clamp(+a[1],0,1), time, +a[2]||0); break;
-    case 'transpose': if(tr) tr.transpose=+a[1]||0; break;
+    case 'transpose': if(tr){ tr.transpose=+a[1]||0; refreshTrackRow(tr); } break;
     case 'clone':{ const s=trackMap.get(a[0]), d=trackMap.get(a[1]);
-      if(s&&d){ d.tokens=s.tokens.slice(); d.div=s.div; d.transpose=(s.transpose||0)+(+a[2]||0); paletteDirty=true; } break; }
-    case 'set':  if(tr){ const r=parseTokens(a.slice(1).join(' ')); tr.tokens=r.tokens; tr.div=r.div; paletteDirty=true; } break;
-    case 'euclid': if(tr){ tr.tokens=euclid(+a[1],+a[2]); tr.div=1; paletteDirty=true; } break;
+      if(s&&d){ d.tokens=s.tokens.slice(); d.div=s.div; d.transpose=(s.transpose||0)+(+a[2]||0); rollDirty=true; refreshTrackRow(d); } break; }
+    case 'set':  if(tr){ const r=parseTokens(a.slice(1).join(' ')); tr.tokens=r.tokens; tr.div=r.div; rollDirty=true; } break;
+    case 'euclid': if(tr){ tr.tokens=euclid(+a[1],+a[2]); tr.div=1; rollDirty=true; } break;
     case 'fx':   if(tr){ const g=(a[1]==='reverb')?tr.sR:tr.sD; g.gain.setTargetAtTime(+a[2]||0,time,0.1);} break;
     case 'filter': rampParam(masterFilter.frequency, +a[0]||20000, time, +a[1]||0); break;
     case 'riser': launchRiser(time, (+a[0]||4)*barDur()); break;
@@ -454,31 +394,16 @@ function scheduler(){
 function startTransport(){
   if(!ac) buildAudio();
   buildTracks(currentPalette);
+  buildTracksPanel();   // bus/sR/sD refs change on rebuild — rebind UI
   if(ac.state==='suspended') ac.resume();
   playing=true; stepIndex=0; nextTime=ac.currentTime+0.08;
-  // Pending seek (user dragged the bar slider before ▶): fast-forward the
-  // arrangement state into bar N before the scheduler fires its first tick.
   if (seekPending) { doSeek(pendingSeekBar); seekPending = false; }
   timer=setInterval(scheduler,TICK); requestAnimationFrame(loop);
 }
 function stopTransport(){ playing=false; clearInterval(timer); timer=null; }
 
-/* ---------- seek to bar N -------------------------------------------- *
- * The bar slider drags the transport forward/backward. Cues are not pure
- * state-setters (they call setTargetAtTime ramps with non-zero time
- * constants), so we can't replay them naively with their original times —
- * gain ramps wouldn't have time to settle. applyCueInstant mirrors applyCue
- * but uses setValueAtTime everywhere (instant value snap, no exponential
- * smoothing) and skips `riser` (it injects an audio source — replaying
- * during seek would inject extra risers).
- *
- * Cues at bars 0..(targetBar-1) are pre-applied; cues AT targetBar fire
- * naturally on the next scheduler tick when stepIndex%16===0.
- */
+/* ---------- seek to bar N (verbatim from studio2) -------------------- */
 let seekPending = false, pendingSeekBar = 0;
-// Forward-declared so the initial loadPreset() can call seekSlider.setValue
-// without a TDZ error. Assigned for real after the first loadPreset returns,
-// once `arr` exists for the format callback.
 let seekSlider = null;
 
 function seekTo(bar) {
@@ -487,8 +412,6 @@ function seekTo(bar) {
   if (playing && ac) {
     doSeek(bar);
   } else {
-    // Pre-play seek: stash target. startTransport will apply it after
-    // building tracks + before the scheduler starts.
     pendingSeekBar = bar;
     seekPending = true;
     curBar = bar;
@@ -500,13 +423,13 @@ function doSeek(bar) {
   const t = ac.currentTime;
   resetArrangement(t);
   for (const c of arr.cues) {
-    if (c.at >= bar) break;   // arr.cues is sorted by .at
+    if (c.at >= bar) break;
     applyCueInstant(c, t);
   }
   stepIndex = bar * 16;
   nextTime = t + 0.05;
   curBar = bar;
-  paletteDirty = true;   // tokens may have changed via set/clone/euclid
+  rollDirty = true;
 }
 
 function applyCueInstant(c, time) {
@@ -515,14 +438,14 @@ function applyCueInstant(c, time) {
     case 'in':   if(tr){ tr.bus.gain.cancelScheduledValues(time); tr.bus.gain.setValueAtTime(1, time); } break;
     case 'out':  if(tr){ tr.bus.gain.cancelScheduledValues(time); tr.bus.gain.setValueAtTime(0.0001, time); } break;
     case 'gain': if(tr){ tr.bus.gain.cancelScheduledValues(time); tr.bus.gain.setValueAtTime(clamp(+a[1],0,1), time); } break;
-    case 'transpose': if(tr) tr.transpose = +a[1] || 0; break;
+    case 'transpose': if(tr){ tr.transpose = +a[1] || 0; refreshTrackRow(tr); } break;
     case 'clone': { const s=trackMap.get(a[0]), d=trackMap.get(a[1]);
-      if(s&&d){ d.tokens=s.tokens.slice(); d.div=s.div; d.transpose=(s.transpose||0)+(+a[2]||0); } break; }
+      if(s&&d){ d.tokens=s.tokens.slice(); d.div=s.div; d.transpose=(s.transpose||0)+(+a[2]||0); refreshTrackRow(d); } break; }
     case 'set':  if(tr){ const r=parseTokens(a.slice(1).join(' ')); tr.tokens=r.tokens; tr.div=r.div; } break;
     case 'euclid': if(tr){ tr.tokens=euclid(+a[1],+a[2]); tr.div=1; } break;
     case 'fx':   if(tr){ const g=(a[1]==='reverb')?tr.sR:tr.sD; g.gain.cancelScheduledValues(time); g.gain.setValueAtTime(+a[2]||0, time); } break;
     case 'filter': masterFilter.frequency.cancelScheduledValues(time); masterFilter.frequency.setValueAtTime(+a[0]||20000, time); break;
-    case 'riser': /* skip — injecting an audio source during seek is wrong */ break;
+    case 'riser': break;
     case 'section': curSection = c.raw || a.join(' '); break;
   }
 }
@@ -534,8 +457,6 @@ const CHAN=new URLSearchParams(location.search).get('chan')||'cymatics';
 $('chname').textContent=CHAN;
 const chan=new BroadcastChannel(CHAN);
 const controlChan=new BroadcastChannel(CHAN+'-control');
-const HEADLESS = new URLSearchParams(location.search).get('headless') === '1';
-if (HEADLESS) document.body.classList.add('headless');
 {
   const fl=$('field-link');
   if(fl){ const q=location.search; if(q) fl.href='./'+q; }
@@ -574,206 +495,283 @@ function broadcast(m,ft){ chan.postMessage({ type:'cymatics', t:performance.now(
   rms:+ft.rms.toFixed(3), bass:+ft.bass.toFixed(3), mid:+ft.mid.toFixed(3),
   treble:+ft.tre.toFixed(3), centroid:+ft.cen01.toFixed(3) }); }
 
-/* ---------- preview field (same equation as studio.html) ------------- */
-const cv=$('cv'),cx=cv.getContext('2d'); const NP=12000, px=new Float32Array(NP), py=new Float32Array(NP);
-for(let i=0;i<NP;i++){ px[i]=Math.random(); py[i]=Math.random(); }
-function reseedParticles(){ for(let i=0;i<NP;i++){ px[i]=Math.random(); py[i]=Math.random(); } }
-function fAbs(x,y,M,N){ return Math.abs(Math.cos(N*Math.PI*x)*Math.cos(M*Math.PI*y)-Math.cos(M*Math.PI*x)*Math.cos(N*Math.PI*y)); }
-function stepParticles(M,N,J,S){ const eps=0.004,k=0.0016*S;
-  for(let i=0;i<NP;i++){ let x=px[i],y=py[i]; const c=fAbs(x,y,M,N);
-    const gx=(fAbs(x+eps,y,M,N)-c)/eps, gy=(fAbs(x,y+eps,M,N)-c)/eps;
-    x-=k*gx+(Math.random()-0.5)*J*0.02; y-=k*gy+(Math.random()-0.5)*J*0.02;
-    if(x<0)x=-x; else if(x>1)x=2-x; if(y<0)y=-y; else if(y>1)y=2-y; px[i]=x; py[i]=y; } }
-function drawParticles(){ const W=cv.width,H=cv.height;
-  cx.fillStyle='rgba(8,8,10,0.30)'; cx.fillRect(0,0,W,H);
-  cx.fillStyle='rgba(95,179,163,0.55)'; for(let i=0;i<NP;i++) cx.fillRect(px[i]*W,py[i]*H,1.4,1.4); }
+/* =====================================================================
+   PIANO ROLL — all tracks rendered on a shared pitch×time grid.
+   ---------------------------------------------------------------------
+   X axis: 0..loopLen steps, where loopLen = max(tokens.length*div).
+   Y axis: MIDI 24..96 mapped linearly (log-pitch is already linear in MIDI).
+   Static cell layer is cached to an offscreen canvas; rebuilt only when
+   `rollDirty` flips true (palette swap, set/clone/euclid cues, reset).
+   Per-frame the live canvas blits the cache + draws the playhead.
+   ===================================================================== */
+const TRACK_COLORS = ['--amber','--teal','--hot'];
+const DRUM_PITCH = {kick:36, snare:60, chh:80, ohh:81, clap:66};
+const MIDI_LO = 24, MIDI_HI = 96;
+const rollCv = $('roll'), rollCx = rollCv.getContext('2d');
+const rollCache = document.createElement('canvas');
+const rollCacheCx = rollCache.getContext('2d');
+let rollDirty = true;
+let rollLoopLen = 64;
+let rollStepPx = 0;
+
+function resizeRollCanvas(){
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = rollCv.clientWidth || 800;
+  const cssH = rollCv.clientHeight || 280;
+  rollCv.width  = Math.max(1, Math.floor(cssW * dpr));
+  rollCv.height = Math.max(1, Math.floor(cssH * dpr));
+  rollCx.setTransform(dpr,0,0,dpr,0,0);
+  rollCache.width  = rollCv.width;
+  rollCache.height = rollCv.height;
+  rollCacheCx.setTransform(dpr,0,0,dpr,0,0);
+  rollDirty = true;
+}
+
+function tokenPitches(tr, tok){
+  if (DRUMS.has(tr.inst)) return [DRUM_PITCH[tr.inst] ?? 60];
+  // Melodic: parse all pitches in a chord token like "a3+c4+e4"
+  const out = [];
+  for (const part of tok.split('+')){
+    const m = noteToMidi(part);
+    if (m != null) out.push(m + (tr.transpose||0));
+  }
+  return out;
+}
+
+function buildRollCache(){
+  const W = rollCv.clientWidth, H = rollCv.clientHeight;
+  rollCacheCx.clearRect(0,0,W,H);
+  rollCacheCx.fillStyle = '#08080a';
+  rollCacheCx.fillRect(0,0,W,H);
+
+  // Loop length across all tracks (in 16th steps). Empty palette -> sensible default.
+  let loopLen = 0;
+  for (const tr of tracks) loopLen = Math.max(loopLen, tr.tokens.length * tr.div);
+  if (!loopLen) loopLen = 64;
+  rollLoopLen = loopLen;
+
+  const stepPx = W / loopLen;
+  rollStepPx = stepPx;
+
+  // Faint vertical bar grid (every 16 steps = 1 bar).
+  rollCacheCx.strokeStyle = 'rgba(74,74,82,0.35)';
+  rollCacheCx.lineWidth = 1;
+  for (let s=0; s<=loopLen; s+=16){
+    const x = Math.round(s * stepPx) + 0.5;
+    rollCacheCx.beginPath();
+    rollCacheCx.moveTo(x, 0); rollCacheCx.lineTo(x, H); rollCacheCx.stroke();
+  }
+
+  // Pitch span — drums get squeezed onto the existing axis via DRUM_PITCH.
+  const pSpan = MIDI_HI - MIDI_LO;
+  const pitchY = (m) => {
+    const t = (clamp(m, MIDI_LO, MIDI_HI) - MIDI_LO) / pSpan;
+    return H - t * H;
+  };
+  const cellH = Math.max(2, Math.floor(H / pSpan));
+
+  tracks.forEach((tr, ti) => {
+    const col = getComputedStyle(document.documentElement)
+      .getPropertyValue(TRACK_COLORS[ti % TRACK_COLORS.length]).trim() || '#5fb3a3';
+    rollCacheCx.fillStyle = col;
+    const total = tr.tokens.length * tr.div;
+    for (let i=0; i<tr.tokens.length; i++){
+      const tok = tr.tokens[i];
+      if (!tok || tok === '~') continue;
+      const step = i * tr.div;
+      if (step >= loopLen) break;
+      const w = Math.max(2, tr.div * stepPx - 1);
+      const pitches = tokenPitches(tr, tok);
+      for (const m of pitches){
+        const y = pitchY(m) - cellH/2;
+        rollCacheCx.fillRect(Math.round(step*stepPx)+0.5, Math.round(y), w, cellH);
+      }
+    }
+  });
+
+  rollDirty = false;
+}
+
+function drawRoll(){
+  if (rollDirty) buildRollCache();
+  const W = rollCv.clientWidth, H = rollCv.clientHeight;
+  rollCx.clearRect(0,0,W,H);
+  rollCx.drawImage(rollCache, 0,0, rollCache.width, rollCache.height, 0,0, W,H);
+
+  // Playhead — only visible while transport runs.
+  if (playing && rollLoopLen){
+    const x = ((stepIndex % rollLoopLen) * rollStepPx);
+    rollCx.strokeStyle = '#e8e8ea';
+    rollCx.lineWidth = 1;
+    rollCx.globalAlpha = 0.85;
+    rollCx.beginPath();
+    rollCx.moveTo(x+0.5, 0); rollCx.lineTo(x+0.5, H); rollCx.stroke();
+    rollCx.globalAlpha = 1;
+  }
+}
 
 /* =====================================================================
-   STUDIO2 — palette + arrangement display with playhead highlighting
-              and per-pane EDIT toggle
-   ---------------------------------------------------------------------
-   Default state: both panes show rich rendered views (.pal-display /
-   .arr-display) with per-token + per-section playhead highlighting in
-   teal. Clicking a pane's EDIT button hides the display and reveals the
-   matching textarea pre-populated from the canonical hidden #code/#arr
-   textareas. Clicking again (or Cmd/Ctrl-Enter inside the textarea)
-   parses + re-applies + re-renders the display. Each pane toggles
-   independently so you can edit the arrangement while watching the
-   palette playhead, or vice versa.
+   TRACKS PANEL — one row per track. Sliders write live to bus/sR/sD.
+   Mute/solo cached in module-scope sets so they survive across UI rebuilds
+   only while `tracks` is the same array (buildTracks clears them).
    ===================================================================== */
-const palDisp = $('palDisp'), arrDisp = $('arrDisp');
-const palEdit = $('palEdit'), arrEdit = $('arrEdit');
-const palBtn  = $('palEditBtn'), arrBtn = $('arrEditBtn');
-const editStatusEl = $('editStatus');
-let paletteEls = [];   // [{name, tokenEls:[span,...], track, staticDiv, staticLen}]
-let arrEls = [];       // [{cue, el}]
-let paletteDirty = true;
-let arrDirty = true;
-function setEditStatus(kind, msg) {
-  if (!editStatusEl) return;
-  editStatusEl.className = kind === 'ok' ? 'ok' : kind === 'bad' ? 'bad' : '';
-  editStatusEl.textContent = msg || '';
+const mutedSet = new Set();
+const preMute = new Map();   // name -> gain prior to mute
+const preSolo = new Map();   // name -> gain prior to solo
+let soloName = null;
+
+const tracksPanelEl = $('tracksPanel');
+const trackRowEls = new Map();   // name -> {row, gain, rev, dly, tpVal, muteBtn, soloBtn}
+const MELODIC_INSTS = new Set(['bass','chord','lead','arp','pluck','gong']);
+const isMelodic = (inst) => !DRUMS.has(inst);   // anything that isn't a drum is treated as melodic
+
+function setBusGainLive(tr, v, time){
+  // Cancel any arrangement-scheduled ramp before forcing a user value,
+  // otherwise the arrangement keeps writing on top of the user drag.
+  tr.bus.gain.cancelScheduledValues(time);
+  tr.bus.gain.setTargetAtTime(v, time, 0.02);
 }
 
-// Build palette DOM. Reads from live `tracks` once they exist (so set/clone/
-// euclid runtime mutations are reflected), else from the static currentPalette
-// (pre-startTransport).
-function buildPaletteDisplay() {
-  palDisp.innerHTML = '';
-  paletteEls = [];
-  const src = tracks.length ? tracks.map(t => ({inst:t.name, tokens:t.tokens, div:t.div, _track:t}))
-                            : currentPalette.map(p => ({inst:p.inst, tokens:p.tokens, div:p.div, _track:null}));
-  for (const row of src) {
-    const line = document.createElement('div'); line.className = 'pal-line';
-    const inst = document.createElement('span'); inst.className = 'pal-inst'; inst.textContent = row.inst + ':';
-    line.appendChild(inst);
-    const toks = document.createElement('span'); toks.className = 'pal-toks';
-    const tokenEls = [];
-    row.tokens.forEach(t => {
-      const s = document.createElement('span');
-      s.className = 'pal-tok' + (t === '~' ? ' rest' : '');
-      s.textContent = t;
-      tokenEls.push(s);
-      toks.appendChild(s);
+function applyMuteSolo(){
+  // Compute the effective mute mask. Solo: only soloName audible. Then mute:
+  // explicit mutes are forced to 0 regardless of solo.
+  const t = ac ? ac.currentTime : 0;
+  for (const tr of tracks){
+    let target = null;   // null = no override (leave whatever arrangement set)
+    if (soloName != null) {
+      target = (tr.name === soloName) ? null : 0.0001;
+    }
+    if (mutedSet.has(tr.name)) target = 0.0001;
+    const row = trackRowEls.get(tr.name);
+    if (target != null && ac){
+      tr.bus.gain.cancelScheduledValues(t);
+      tr.bus.gain.setTargetAtTime(target, t, 0.02);
+    } else if (ac){
+      // Restore: if a row exists and we have a remembered pre-value, use it;
+      // otherwise leave the value alone (arrangement is in charge).
+      const v = preMute.has(tr.name) ? preMute.get(tr.name)
+              : preSolo.has(tr.name) ? preSolo.get(tr.name) : null;
+      if (v != null){
+        tr.bus.gain.cancelScheduledValues(t);
+        tr.bus.gain.setTargetAtTime(v, t, 0.02);
+      }
+    }
+    if (row){
+      row.muteBtn.classList.toggle('on', mutedSet.has(tr.name));
+      row.soloBtn.classList.toggle('on', soloName === tr.name);
+    }
+  }
+}
+
+function refreshTrackRow(tr){
+  const row = trackRowEls.get(tr.name);
+  if (!row) return;
+  if (row.tpVal) row.tpVal.textContent = (tr.transpose>0?'+':'') + (tr.transpose||0);
+}
+
+function buildTracksPanel(){
+  tracksPanelEl.innerHTML = '';
+  trackRowEls.clear();
+  for (const tr of tracks){
+    const row = document.createElement('div'); row.className = 'track-row';
+    const name = document.createElement('span'); name.className = 'tn'; name.textContent = tr.name;
+    row.appendChild(name);
+
+    const gLab = document.createElement('span'); gLab.className = 'lab'; gLab.textContent = 'gain';
+    row.appendChild(gLab);
+    const gain = document.createElement('input');
+    gain.type='range'; gain.min='0'; gain.max='1.5'; gain.step='0.01';
+    gain.value = String(tr.bus.gain.value);
+    gain.addEventListener('input', ()=>{
+      const v = parseFloat(gain.value);
+      preMute.set(tr.name, v); preSolo.set(tr.name, v);
+      if (mutedSet.has(tr.name) || (soloName!=null && soloName!==tr.name)) return;   // muted/silenced — don't override
+      setBusGainLive(tr, v, ac ? ac.currentTime : 0);
     });
-    line.appendChild(toks);
-    palDisp.appendChild(line);
-    paletteEls.push({ name: row.inst, tokenEls, track: row._track, staticDiv: row.div, staticLen: row.tokens.length });
-  }
-  paletteDirty = false;
-}
+    row.appendChild(gain);
 
-// Highlight the currently-active token per row. Active token for a track
-// is floor((stepIndex mod (len*div)) / div). When not playing, clear all.
-let lastPlayheadKey = '';
-function updatePalettePlayhead() {
-  if (paletteDirty) buildPaletteDisplay();
-  const active = playing;
-  let key = active ? String(stepIndex) : 'idle';
-  if (key === lastPlayheadKey) return;
-  lastPlayheadKey = key;
-  for (const e of paletteEls) {
-    const tr = e.track;
-    const len = tr ? tr.tokens.length : e.staticLen;
-    const dv  = tr ? tr.div          : e.staticDiv;
-    if (tr && tr.tokens.length !== e.tokenEls.length) { paletteDirty = true; return; }
-    const total = len * dv;
-    const local = active ? (stepIndex % total) : -1;
-    const cur = (local >= 0) ? Math.floor(local / dv) : -1;
-    for (let i = 0; i < e.tokenEls.length; i++) {
-      const should = (i === cur);
-      const has = e.tokenEls[i].classList.contains('playing');
-      if (should !== has) e.tokenEls[i].classList.toggle('playing', should);
+    let tpVal = null;
+    if (isMelodic(tr.inst)){
+      const tp = document.createElement('span'); tp.className = 'tp';
+      const tpLab = document.createElement('span'); tpLab.className='lab'; tpLab.textContent='tp';
+      const minus = document.createElement('button'); minus.textContent='−';
+      const val = document.createElement('span'); val.className='val'; val.textContent = (tr.transpose>0?'+':'')+tr.transpose;
+      const plus = document.createElement('button'); plus.textContent='+';
+      const apply = (n)=>{ tr.transpose = clamp(n, -24, 24); val.textContent = (tr.transpose>0?'+':'')+tr.transpose; };
+      minus.addEventListener('click', ()=>apply(tr.transpose-1));
+      plus.addEventListener('click', ()=>apply(tr.transpose+1));
+      // Right-click resets to 0 — small affordance, no extra DOM
+      val.addEventListener('click', ()=>apply(0));
+      tp.appendChild(tpLab); tp.appendChild(minus); tp.appendChild(val); tp.appendChild(plus);
+      row.appendChild(tp);
+      tpVal = val;
     }
-  }
-}
 
-function buildArrangementDisplay() {
-  arrDisp.innerHTML = '';
-  arrEls = [];
-  if (!arr) { arrDirty = false; return; }
-  for (const c of arr.cues) {
-    const line = document.createElement('div');
-    line.className = 'arr-line' + (c.cmd === 'section' ? ' section' : '');
-    const bar = document.createElement('span'); bar.className = 'arr-bar';
-    bar.textContent = String(c.at);
-    const cmd = document.createElement('span'); cmd.className = 'arr-cmd';
-    cmd.textContent = c.cmd;
-    const args = document.createElement('span'); args.className = 'arr-args';
-    args.textContent = c.raw || c.args.join(' ');
-    line.appendChild(bar); line.appendChild(cmd); line.appendChild(args);
-    arrDisp.appendChild(line);
-    arrEls.push({ cue: c, el: line });
-  }
-  const meta = document.createElement('div'); meta.className = 'arr-meta';
-  meta.textContent = `@length ${arr.length}`;
-  arrDisp.appendChild(meta);
-  arrDirty = false;
-}
+    const rLab = document.createElement('span'); rLab.className = 'lab'; rLab.textContent = 'rev';
+    row.appendChild(rLab);
+    const rev = document.createElement('input');
+    rev.type='range'; rev.min='0'; rev.max='1'; rev.step='0.01';
+    rev.value = String(tr.sR.gain.value);
+    rev.addEventListener('input', ()=>{
+      if (!ac) return;
+      tr.sR.gain.cancelScheduledValues(ac.currentTime);
+      tr.sR.gain.setTargetAtTime(parseFloat(rev.value), ac.currentTime, 0.05);
+    });
+    row.appendChild(rev);
 
-// Highlight the active section = latest section cue with at<=curBar. All cues
-// with at in [activeSecAt, nextSecAt) get the playing tint; the section
-// header row gets the stronger background.
-let lastSecKey = '';
-function updateArrPlayhead() {
-  if (arrDirty) buildArrangementDisplay();
-  const active = playing && arrangeOn;
-  let activeSecAt = -1, nextSecAt = Infinity;
-  if (active) {
-    for (const e of arrEls) {
-      if (e.cue.cmd === 'section' && e.cue.at <= curBar) activeSecAt = Math.max(activeSecAt, e.cue.at);
-    }
-    for (const e of arrEls) {
-      if (e.cue.cmd === 'section' && e.cue.at > activeSecAt) nextSecAt = Math.min(nextSecAt, e.cue.at);
-    }
-  }
-  const key = active ? `${activeSecAt}-${nextSecAt}` : 'idle';
-  if (key === lastSecKey) return;
-  lastSecKey = key;
-  for (const e of arrEls) {
-    const inSec = active && e.cue.at >= activeSecAt && e.cue.at < nextSecAt;
-    if (inSec !== e.el.classList.contains('playing')) {
-      e.el.classList.toggle('playing', inSec);
-    }
-  }
-}
+    const dLab = document.createElement('span'); dLab.className = 'lab'; dLab.textContent = 'dly';
+    row.appendChild(dLab);
+    const dly = document.createElement('input');
+    dly.type='range'; dly.min='0'; dly.max='1'; dly.step='0.01';
+    dly.value = String(tr.sD.gain.value);
+    dly.addEventListener('input', ()=>{
+      if (!ac) return;
+      tr.sD.gain.cancelScheduledValues(ac.currentTime);
+      tr.sD.gain.setTargetAtTime(parseFloat(dly.value), ac.currentTime, 0.05);
+    });
+    row.appendChild(dly);
 
-/* ---------- EDIT mode toggle ----------------------------------------- *
- * Each pane independently flips between display and textarea. While in
- * edit mode the display is hidden; on save the textarea content is
- * copied into the canonical #code/#arr shim and applyAll() reparses +
- * rebuilds the display from scratch. Cmd/Ctrl-Enter inside a textarea
- * is a shortcut for clicking the button again (save + exit).
- */
-const editState = { pal: false, arr: false };
-function enterEditMode(which) {
-  if (which === 'pal') {
-    palEdit.value = $('code').value;
-    palDisp.hidden = true; palEdit.hidden = false;
-    palBtn.textContent = 'save'; palBtn.classList.add('editing');
-    editState.pal = true;
-    palEdit.focus();
-  } else {
-    arrEdit.value = $('arr').value;
-    arrDisp.hidden = true; arrEdit.hidden = false;
-    arrBtn.textContent = 'save'; arrBtn.classList.add('editing');
-    editState.arr = true;
-    arrEdit.focus();
+    const ms = document.createElement('span'); ms.className = 'ms';
+    const muteBtn = document.createElement('button'); muteBtn.textContent='M'; muteBtn.title='mute';
+    const soloBtn = document.createElement('button'); soloBtn.className='solo'; soloBtn.textContent='S'; soloBtn.title='solo';
+    muteBtn.addEventListener('click', ()=>{
+      if (mutedSet.has(tr.name)){
+        mutedSet.delete(tr.name);
+      } else {
+        preMute.set(tr.name, tr.bus.gain.value);
+        mutedSet.add(tr.name);
+      }
+      applyMuteSolo();
+    });
+    soloBtn.addEventListener('click', ()=>{
+      if (soloName === tr.name){
+        soloName = null;
+      } else {
+        // Remember every track's current gain for the un-solo restore.
+        if (soloName == null){ for (const t2 of tracks) preSolo.set(t2.name, t2.bus.gain.value); }
+        soloName = tr.name;
+      }
+      applyMuteSolo();
+    });
+    ms.appendChild(muteBtn); ms.appendChild(soloBtn);
+    row.appendChild(ms);
+
+    tracksPanelEl.appendChild(row);
+    trackRowEls.set(tr.name, { row, gain, rev, dly, tpVal, muteBtn, soloBtn });
   }
-}
-function exitEditMode(which) {
-  if (which === 'pal') {
-    $('code').value = palEdit.value;
-    palEdit.hidden = true; palDisp.hidden = false;
-    palBtn.textContent = 'edit'; palBtn.classList.remove('editing');
-    editState.pal = false;
-  } else {
-    $('arr').value = arrEdit.value;
-    arrEdit.hidden = true; arrDisp.hidden = false;
-    arrBtn.textContent = 'edit'; arrBtn.classList.remove('editing');
-    editState.arr = false;
-  }
-  applyAll();
+  applyMuteSolo();
 }
 
 /* ---------- main loop ------------------------------------------------ */
 function loop(){
   if(!playing) {
-    // Final paint on stop so spans clear back to neutral. Skipped while a
-    // pane is in edit mode (display is hidden — DOM mutation is wasted).
-    if (!editState.pal) updatePalettePlayhead();
-    if (!editState.arr) updateArrPlayhead();
+    drawRoll();
     return;
   }
   const ft=analyze(), m=mapToField(ft);
   field.M=m.M; field.N=m.N; field.J=m.J; field.S=m.S;
-  if(m.reseed) reseedParticles(); broadcast(m,ft);
-  if (!HEADLESS) { stepParticles(field.M,field.N,field.J,field.S); drawParticles(); }
-  $('rM').textContent=field.M; $('rN').textContent=field.N;
-  $('rJ').textContent=field.J.toFixed(2); $('rS').textContent=field.S.toFixed(2);
-  $('mRms').style.width=clamp(ft.rms*180,0,100)+'%'; $('mBass').style.width=clamp(ft.bass*120,0,100)+'%';
-  $('mMid').style.width=clamp(ft.mid*140,0,100)+'%'; $('mTre').style.width=clamp(ft.tre*160,0,100)+'%';
-  $('mCen').style.width=clamp(ft.cen01*100,0,100)+'%';
+  broadcast(m,ft);
+  drawRoll();
   $('curbar').textContent=arrangeOn?curBar:'—'; $('cursec').textContent=arrangeOn?curSection:'all on';
   if (arr && arrangeOn) {
     const pct = Math.round((curBar / Math.max(1, arr.length - 1)) * 100);
@@ -782,27 +780,12 @@ function loop(){
     $('curpct').textContent = '—';
   }
   $('beatdot').classList.toggle('on',ft.beat);
-  // Playhead highlights — skip the panes that are currently being edited
-  // (display hidden, DOM mutation wasted). Cheap dirty/key-gated noop when
-  // nothing has moved.
-  if (!editState.pal) updatePalettePlayhead();
-  if (!editState.arr) updateArrPlayhead();
-  // Sync the seek slider with the transport. silent:true so we don't recurse
-  // into seekTo via the onChange handler. setValue snaps + early-returns if
-  // unchanged, so per-frame calls cost ~nothing when curBar hasn't advanced.
   if (seekSlider && arrangeOn) seekSlider.setValue(curBar, { silent: true });
   requestAnimationFrame(loop);
 }
 
 /* =====================================================================
-   PRESETS — loaded from ./presets/*.json at startup.
-   ---------------------------------------------------------------------
-   The manifest ./presets/index.json lists the preset ids in dropdown
-   order. Each id resolves to ./presets/<id>.json. The loader normalizes
-   to {id,label,bpm,palette,arrangement}; richer authoring formats are
-   accepted via fallbacks (meta.displayName, meta.bpm, paletteFull).
-   See presets/index.json `_doc` for the full schema. The PRESETS map
-   below is populated by initPresets() before any UI wiring runs.
+   PRESETS — verbatim from studio2
    ===================================================================== */
 const PRESETS = {};
 let DEFAULT_PRESET_KEY = 'gm-trance';
@@ -824,8 +807,6 @@ async function loadPresetsFromDisk() {
     return r.json();
   });
   const ids = Array.isArray(idx.presets) ? idx.presets : [];
-  // Parallel fetch — even on a slow disk-backed dev server seven small
-  // JSONs come back faster than we can populate the <select>.
   const loaded = await Promise.all(ids.map(async (id) => {
     try {
       const raw = await fetch(`./presets/${id}.json`).then(r => {
@@ -834,7 +815,7 @@ async function loadPresetsFromDisk() {
       });
       return normalizePreset(raw, id);
     } catch (e) {
-      console.warn(`[studio2] preset '${id}' failed to load:`, e.message);
+      console.warn(`[studio3] preset '${id}' failed to load:`, e.message);
       return null;
     }
   }));
@@ -843,21 +824,16 @@ async function loadPresetsFromDisk() {
   else if (Object.keys(PRESETS)[0]) DEFAULT_PRESET_KEY = Object.keys(PRESETS)[0];
 }
 
-
 let currentPalette=[];
 function applyAll(){
   try{
     currentPalette=parsePalette($('code').value);
     arr=parseArr($('arr').value); $('len').textContent=arr.length;
-    paletteDirty = true; arrDirty = true;
-    if(ac){ buildTracks(currentPalette); if(playing && arrangeOn){ stepIndex=0; nextTime=ac.currentTime+0.05; curSection='—'; } }
-    // Eager build so the display is current before the next animation
-    // frame — important on idle (no `loop` running to lazily catch up).
-    buildPaletteDisplay(); buildArrangementDisplay();
-    setEditStatus('ok', '✓ applied');
+    rollDirty = true;
+    if(ac){ buildTracks(currentPalette); buildTracksPanel();
+      if(playing && arrangeOn){ stepIndex=0; nextTime=ac.currentTime+0.05; curSection='—'; } }
   }catch(e){
-    console.error('[studio2]', e.message);
-    setEditStatus('bad', '⚠ ' + e.message);
+    console.error('[studio3]', e.message);
   }
 }
 
@@ -865,53 +841,57 @@ function loadPreset(key){
   const p = PRESETS[key]; if(!p) return;
   currentTrackLabel = p.label;
   $('bpm').value = p.bpm;
-  // Canonical store is the hidden #code/#arr. Mirror into the (hidden)
-  // editable textareas too so opening EDIT later sees the latest text,
-  // even if the user switches presets while a textarea is mid-edit.
-  $('code').value = p.palette; palEdit.value = p.palette;
-  $('arr').value  = p.arrangement; arrEdit.value = p.arrangement;
+  $('code').value = p.palette;
+  $('arr').value  = p.arrangement;
   applyAll();
+  if (!ac){
+    // Pre-audio: tracks haven't been built yet (buildTracks needs ac). Show
+    // the palette shape on the roll using currentPalette as a stand-in by
+    // synthesising minimal pseudo-tracks (no bus/sR/sD — they're unused by
+    // buildRollCache, which reads inst/tokens/div/transpose only).
+    tracks = currentPalette.map(p => ({
+      name:p.inst, inst:p.inst, tokens:p.tokens.slice(), div:p.div, transpose:0,
+      bus:null, sR:null, sD:null, base:null,
+    }));
+    rollDirty = true;
+  }
   if(ac && ac._dly) ac._dly.delayTime.setTargetAtTime(60/bpm()*0.75, ac.currentTime, 0.05);
   if(ac && masterFilter) masterFilter.frequency.setValueAtTime(20000, ac.currentTime);
-  // Reset the seek slider to bar 0 and clear any pending seek from the prior
-  // preset. Also resize its range to match the new arrangement length so
-  // 1 dot = 1 bar continues to hold for presets that aren't 64 bars.
   curBar = 0; seekPending = false; pendingSeekBar = 0;
   if (seekSlider) {
     seekSlider.setRange({ max: Math.max(0, (arr?.length || 64) - 1) });
     seekSlider.setValue(0, { silent: true });
+  }
+  // Rebuild tracks panel from whatever tracks now hold (real or pseudo).
+  // For pseudo-tracks the gain/rev/dly sliders point at null buses; their
+  // input handlers are guarded by `ac` checks so dragging is a no-op pre-play.
+  if (!ac) buildTracksPanelPreAudio();
+}
+
+function buildTracksPanelPreAudio(){
+  // Pre-audio variant: same row layout but the sliders are inert (no bus).
+  // First click of ▶ rebuilds via startTransport -> buildTracksPanel, so the
+  // controls become live then.
+  tracksPanelEl.innerHTML = '';
+  trackRowEls.clear();
+  for (const tr of tracks){
+    const row = document.createElement('div'); row.className = 'track-row';
+    const name = document.createElement('span'); name.className = 'tn'; name.textContent = tr.name;
+    row.appendChild(name);
+    const note = document.createElement('span'); note.className='lab';
+    note.textContent = 'press ▶ to activate';
+    row.appendChild(note);
+    tracksPanelEl.appendChild(row);
   }
 }
 
 const presetSel = $('preset');
 presetSel.addEventListener('change', () => loadPreset(presetSel.value));
 
-// EDIT-mode buttons: toggle each pane between display and textarea. Inside
-// a textarea, Cmd/Ctrl-Enter is a shortcut for "save + exit edit".
-palBtn.addEventListener('click', () => editState.pal ? exitEditMode('pal') : enterEditMode('pal'));
-arrBtn.addEventListener('click', () => editState.arr ? exitEditMode('arr') : enterEditMode('arr'));
-palEdit.addEventListener('input', () => setEditStatus('', ''));
-arrEdit.addEventListener('input', () => setEditStatus('', ''));
-palEdit.addEventListener('keydown', e => {
-  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); exitEditMode('pal'); }
-});
-arrEdit.addEventListener('keydown', e => {
-  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); exitEditMode('arr'); }
-});
-
-// Async startup. Order matters:
-//   1. Fetch presets/index.json + each preset's JSON  (populates PRESETS)
-//   2. Populate the dropdown
-//   3. loadPreset(initialKey)                          (populates `arr` for the slider)
-//   4. Construct the 8-cell seek slider                (its format() reads `arr`)
-//   5. Wire controlChan + autoplay                      (both need PRESETS to be live)
-// The play button is already wired and idempotent — clicking before init
-// finishes is a no-op (currentPalette is empty, startTransport would do nothing
-// useful), so we don't bother gating it on a loading flag.
 async function init() {
   await loadPresetsFromDisk();
   if (!Object.keys(PRESETS).length) {
-    setEditStatus('bad', '⚠ no presets loaded — check ./presets/index.json');
+    console.error('[studio3] no presets loaded — check ./presets/index.json');
     return;
   }
   for (const [k, v] of Object.entries(PRESETS)) {
@@ -924,11 +904,6 @@ async function init() {
   presetSel.value = initialKey;
   loadPreset(initialKey);
 
-  // Seek slider. Created AFTER first loadPreset so `arr` exists for the format
-  // callback. cells:8 + tight:true gives exactly 64 dots, one per bar of a
-  // 64-bar arrangement; the cell color flips at every 8th dot (= every 8
-  // bars completed). max is set to arr.length-1 below so shorter arrangements
-  // don't stretch the bar — 1 dot stays = 1 bar regardless of length.
   seekSlider = new BrailleSlider({
     mount: $('seek-mount'),
     min: 0, max: Math.max(0, (arr?.length || 64) - 1), step: 1,
@@ -941,6 +916,10 @@ async function init() {
     },
   });
   seekSlider.onChange((v) => seekTo(v));
+
+  // First paint of the roll (so a fresh load shows the preset shape immediately).
+  resizeRollCanvas();
+  drawRoll();
 
   controlChan.onmessage = (e) => {
     const d = e.data;
@@ -962,21 +941,34 @@ async function init() {
   }
 }
 
-init().catch(e => {
-  console.error('[studio2] init failed:', e);
-  setEditStatus('bad', '⚠ init failed: ' + e.message);
-});
+init().catch(e => console.error('[studio3] init failed:', e));
+
+window.addEventListener('resize', () => { resizeRollCanvas(); drawRoll(); });
 
 $('play').addEventListener('click',()=>{
   if(!playing){ startTransport(); $('play').textContent='■ stop'; $('play').classList.add('on'); }
   else{ stopTransport(); $('play').textContent='▶ play'; $('play').classList.remove('on');
-    // Force one more paint so playing-class spans clear on the panes that
-    // aren't currently being edited (loop() exits early on !playing).
-    lastPlayheadKey=''; lastSecKey='';
-    if (!editState.pal) updatePalettePlayhead();
-    if (!editState.arr) updateArrPlayhead(); } });
+    drawRoll(); } });
 $('vol').addEventListener('input',e=>{ if(master) master.gain.setTargetAtTime(parseFloat(e.target.value),ac.currentTime,0.02); });
 $('bpm').addEventListener('change',()=>{ if(ac&&ac._dly) ac._dly.delayTime.setTargetAtTime(60/bpm()*0.75,ac.currentTime,0.05); });
+
+/* ---------- master knobs --------------------------------------------- */
+// Filter cutoff slider is a linear 0..1 input mapped to log 200..20000 Hz.
+$('mFilter').addEventListener('input', e => {
+  if (!ac || !masterFilter) return;
+  const t = parseFloat(e.target.value);
+  const lo = Math.log(200), hi = Math.log(20000);
+  const hz = Math.exp(lo + (hi - lo) * t);
+  masterFilter.frequency.cancelScheduledValues(ac.currentTime);
+  masterFilter.frequency.setTargetAtTime(hz, ac.currentTime, 0.05);
+});
+$('mRwet').addEventListener('input', e => {
+  if (!ac || !rwet) return;
+  rwet.gain.setTargetAtTime(parseFloat(e.target.value), ac.currentTime, 0.05);
+});
+$('mDwet').addEventListener('input', e => {
+  if (!ac || !dwet) return;
+  dwet.gain.setTargetAtTime(parseFloat(e.target.value), ac.currentTime, 0.05);
+});
 </script>
-</content>
-</invoke>
+

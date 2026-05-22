@@ -1,0 +1,8 @@
+{
+  "schema": "cymatics-studio.preset/1",
+  "id": "am-trance",
+  "label": "A-minor halftime trance",
+  "bpm": 110,
+  "palette": "kick:  x ~ ~ ~  ~ ~ ~ ~  x ~ ~ ~  ~ ~ ~ ~\nclap:  ~ ~ ~ ~  ~ ~ ~ ~  ~ ~ ~ ~  x ~ ~ ~\nchh:   ~ ~ x ~  ~ ~ ~ ~  ~ ~ x ~  ~ ~ ~ ~\nohh:   ~ ~ ~ ~  ~ ~ ~ ~  ~ ~ ~ ~  ~ ~ x ~\nbass:  a1 ~ ~ ~  ~ ~ a1 ~  f1 ~ ~ ~  ~ ~ f1 ~  /4\nchord: a3+c4+e4+g4  f3+a3+c4+e4  d3+f3+a3+c4  e3+g3+b3+d4  /16\narp:   ~ /16\nlead:  ~ ~ ~ e5  ~ ~ ~ ~  ~ ~ ~ c5  ~ ~ ~ ~  /4",
+  "arrangement": "@length 64\n0   section drift\n0   in chord\n0   fx chord reverb 0.5\n12  section pulse\n12  in kick\n12  in bass\n20  section move\n20  in chh\n24  in clap\n32  section voice\n32  in lead\n36  fx lead delay 0.6\n40  section turn\n40  set chord c3+e3+g3+b3  a3+c4+e4+g4  f3+a3+c4+e4  g3+b3+d4+f4  /16\n40  filter 2400 4\n48  section breath\n48  out kick\n48  out clap\n48  filter 1600 6\n56  section settle\n56  filter 18000 4\n60  in kick\n60  in clap"
+}

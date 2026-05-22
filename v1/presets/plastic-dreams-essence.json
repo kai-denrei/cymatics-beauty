@@ -1,0 +1,35 @@
+{
+  "schema": "cymatics-studio.preset/1",
+  "id": "plastic-dreams-essence",
+  "label": "Plastic Dreams — one riff, circling",
+  "bpm": 128,
+
+  "palette": "# Plastic Dreams — ESSENCE PORTRAIT (one circling riff, restraint)\n# C minor, DEEP organ (low register). kick four-on-floor. NOTHING busy.\n# 'organ' is aliased to 'lead' (studio engine has no organ voice — see\n# meta.originalInstruments). 'gong' track is preserved but silent until a\n# gong voice is added; arrangement cues on it are no-ops.\nkick: x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ /1\n# the spine: a deep riff that circles back every 4 bars. the ONLY melodic element.\nlead: c3 ~ g3 ~ eb3 ~ g3 ~ c3 ~ eb3 ~ g3 ~ bb3 ~ c3 ~ g3 ~ eb3 ~ g3 ~ c3 ~ bb2 ~ g2 ~ ~ ~ c3 ~ g3 ~ eb3 ~ g3 ~ c3 ~ eb3 ~ g3 ~ bb3 ~ ab2 ~ eb3 ~ c3 ~ eb3 ~ g3 ~ f3 ~ eb3 ~ d3 ~ /1\n# rare punctuation — a single gong boom (silent until 'gong' voice exists).\ngong: x ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ /1\n# the LATE, only addition: one sparse offbeat hat. brought in near the end, never busy.\nchh: ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ /1",
+
+  "arrangement": "@length 64\n\n0   section call            ; the gong + riff + kick land like a call to the floor\n0   in gong\n0   in kick\n0   in lead\n# then: NOTHING is added for a long time. the riff just circles. this emptiness IS the hook.\n\n16  section evolve-1        ; the riff mutates — two ghost tones appear. no new tracks.\n16  set lead c3 ~ g3 ~ eb3 ~ g3 bb3 c3 ~ eb3 ~ g3 ~ bb3 ~ c3 ~ g3 ~ eb3 ~ g3 f3 c3 ~ bb2 ~ g2 ~ ~ ~ c3 ~ g3 ~ eb3 ~ g3 ~ c3 ~ eb3 ~ g3 ~ bb3 ~ ab2 ~ eb3 ~ c3 ~ eb3 ~ g3 ~ f3 ~ eb3 ~ d3 ~ /1\n\n32  section evolve-2        ; riff reaches up an octave occasionally. gong returns once.\n32  in gong\n32  set lead c3 ~ g3 ~ eb3 ~ g3 bb3 c3 ~ eb3 ~ g3 c4 bb3 ~ c3 ~ g3 ~ eb3 ~ g3 f3 c3 ~ bb2 ~ g2 bb3 ~ ~ c3 ~ g3 ~ eb3 ~ g3 ~ c3 ~ eb3 ~ g3 c4 bb3 ~ ab2 ~ eb3 ~ c3 ~ eb3 ~ g3 ~ f3 ~ eb3 ~ d3 ~ /1\n\n48  section evolve-3        ; busier INNER motion (same shape) + the single sparse hat, soft.\n48  set lead c3 eb3 g3 ~ eb3 ~ g3 bb3 c3 bb3 eb3 ~ g3 c4 bb3 ~ c3 ~ g3 ~ eb3 ~ g3 f3 c3 ~ bb2 ~ g2 bb3 ~ ~ c3 bb3 g3 ~ eb3 ~ g3 ~ c3 d3 eb3 ~ g3 c4 bb3 ~ ab2 ~ eb3 ~ c3 ~ eb3 ~ g3 ~ f3 ~ eb3 ~ d3 ~ /1\n48  in chh\n48  gain chh 0.5 4\n# loop: the cycle continues. there is no drop and no breakdown — the trance is the point.\n# NET: across 64 bars the riff slowly densifies WITHOUT the arrangement ever becoming busy.",
+
+  "meta": {
+    "title": "Plastic Dreams (essence portrait)",
+    "essence": "ONE deep organ riff that circles and slowly evolves over a steady four-on-the-floor pulse. Hypnotic BECAUSE almost nothing else happens. The build is the riff MUTATING, never layers piling up. A rare gong punctuates.",
+    "inspiration": "Jaydee — 'Plastic Dreams' (1992). COPYRIGHTED work; this is an inspired-by homage using the generic four-on-floor idiom + an ORIGINAL circling riff evoking the deep-organ character, NOT a transcription.",
+    "key": "C", "mode": "minor", "loopBars": 4, "arrangementBars": 64,
+    "designPrinciple": "ESSENCE-FIRST, NOT TEMPLATE. RESTRAINT IS THE RULE. Only kick + the single organ riff + a rare gong. NO chord stabs, NO arp, NO busy hats, NO section-swap drama. The earlier version added all of those and destroyed the hypnotism. Evolution happens INSIDE the riff via slow mutation, not by adding tracks.",
+    "originalInstruments": {
+      "organ": "Renamed to 'lead' in this preset because the studio's voice engine has no organ. The intended timbre is a deep Hammond/drawbar character (stacked sines, percussive attack, slight chorus/vibrato) — a synth-voice task, not a pattern task.",
+      "gong": "Track preserved with original name; currently silent because the engine has no gong voice. Arrangement 'in gong' cues are no-ops until a voice is added."
+    }
+  },
+
+  "essenceNotes": {
+    "whatChangedVsFailedVersion": "Earlier version added hats, claps, chord stabs, an arp, and dramatic section swaps — every one of which fights 'skeletal and hypnotic'. Now: kick + riff only, and change happens by mutating the riff, not by stacking layers.",
+    "whyMutationNotLayering": "Hypnosis comes from sameness; interest comes from slow change to the SAME element. So the riff evolves in place (3 mutation frames) while the texture stays nearly empty.",
+    "theGong": "Punctuation, not groove. Rare hits mark sections like the original's opening gong-call.",
+    "cymaticsCoupling": "A near-static spectrum dominated by one low-mid riff = a steady, slowly-breathing field that shifts subtly as the riff mutates. The visual hypnotism mirrors the musical hypnotism — exactly because nothing busy is competing."
+  },
+
+  "caveats": {
+    "copyright": "Original is copyrighted; this reproduces only the generic four-on-floor idiom + an ORIGINAL riff evoking the character. Homage, not cover.",
+    "swing": "House sits slightly behind the grid; the straight 16th grid can't swing (engine feature). Straight here — logged.",
+    "restraintIsFragile": "Resist the urge to 'improve' this by adding parts. If it starts sounding busy, the essence is lost. Any addition must be tiny and late."
+  }
+}

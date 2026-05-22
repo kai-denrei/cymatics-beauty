@@ -1,9 +1,10 @@
 // Braille progress-bar slider.
 //
-// Replaces native <input type=range>. Each instance is a row of four braille
-// cells; one cell advances through 9 fill states (⠀ → ⣿), and the
-// four cells are colored from a six-stop palette as fill crosses 25/50/75/100%
-// boundaries. 37 discrete states map onto the [min,max] range.
+// Replaces native <input type=range>. Each instance is a row of N braille
+// cells (default 4); one cell advances through 9 fill states (⠀ → ⣿),
+// and completed cells are colored from a six-stop palette. With N=4 there
+// are 37 discrete states; the seek bar in studio2 uses N=8 (73 states,
+// 8 cells × 8 dots ≈ 1 dot per bar across a 64-bar arrangement).
 //
 // Rendering logic and palette extracted from kai-denrei/braille-lab/progress/
 // (MIT). Same state machine; rewrapped as a vanilla-JS reusable component
@@ -15,7 +16,6 @@ const FILL_SHAPES = [
   "⣇", "⣧", "⣷", "⣿",
 ];
 const PLACEHOLDER = "⣿";
-const TOTAL_STATES = 37;
 
 export const PALETTES = {
   amber: {
@@ -52,30 +52,62 @@ export const PALETTES = {
   },
 };
 
-function stateAt(n) {
-  const glyphs = [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER, PLACEHOLDER];
-  const colors = ["dim", "dim", "dim", "dim"];
+// Default (percentage) state machine: cells × 9 + 1 states. Each cell has 9
+// in-cell states — 8 dot-fills plus a 9th "transition" state where the cell
+// flips to its done color BEFORE the next cell starts filling. This extra
+// state is what lets a percentage-driven slider hit 100% visually even when
+// the value range doesn't divide evenly into the dot count.
+//
+// `cells` >= 1. Done colors cycle every 4 cells because the palette only
+// defines done-1..done-4.
+function stateAt(n, cells) {
+  const glyphs = new Array(cells).fill(PLACEHOLDER);
+  const colors = new Array(cells).fill("dim");
   if (n <= 0) return { glyphs, colors };
   const blockState = n - 1;
   const block = Math.floor(blockState / 9);
   const inBlock = blockState % 9;
-  for (let i = 0; i < block; i++) colors[i] = `done-${i + 1}`;
+  for (let i = 0; i < block; i++) colors[i] = `done-${(i % 4) + 1}`;
   if (inBlock < 8) {
     glyphs[block] = FILL_SHAPES[inBlock + 1];
     colors[block] = "default";
   } else {
-    colors[block] = `done-${block + 1}`;
+    colors[block] = `done-${(block % 4) + 1}`;
   }
   return { glyphs, colors };
 }
 
-function stateIndexForPercent(percent) {
+// Tight state machine: cells × 8 states total, ONE dot per state. No extra
+// in-cell transition state — when a cell fills to 8 dots it flips directly
+// to its done color, and the next step starts filling the next cell. Used
+// by the studio2 seek bar so 1 dot maps exactly to 1 bar of the arrangement
+// (no mid-bar "2-dot jumps" to land on a transition state). Color change
+// every 8th dot is the only signal that 8 bars are done.
+function stateAtTight(n, cells) {
+  const glyphs = new Array(cells).fill(PLACEHOLDER);
+  const colors = new Array(cells).fill("dim");
+  if (n <= 0) return { glyphs, colors };
+  for (let block = 0; block < cells; block++) {
+    const dots = Math.max(0, Math.min(8, n - block * 8));
+    if (dots === 0) continue;          // still PLACEHOLDER ⣿ in dim
+    if (dots === 8) {
+      glyphs[block] = PLACEHOLDER;     // ⣿
+      colors[block] = `done-${(block % 4) + 1}`;
+    } else {
+      glyphs[block] = FILL_SHAPES[dots];
+      colors[block] = "default";
+    }
+  }
+  return { glyphs, colors };
+}
+
+function stateIndexForPercent(percent, totalStates) {
   const p = Math.max(0, Math.min(100, percent));
-  return Math.floor((p / 100) * (TOTAL_STATES - 1));
+  return Math.floor((p / 100) * (totalStates - 1));
 }
 
 export class BrailleSlider {
-  constructor({ mount, min, max, step, value, label, palette = "amber", format }) {
+  constructor({ mount, min, max, step, value, label, palette = "amber", format, cells = 4, tight = false }) {
     this.min = min;
     this.max = max;
     // NOTE: `stepSize`, not `step`. We also have a `step(dir)` method below;
@@ -84,12 +116,29 @@ export class BrailleSlider {
     // tap to throw TypeError silently inside the event handler. This bug
     // was responsible for three rounds of "buttons don't work."
     this.stepSize = step;
+    this.cells = cells;
+    this.tight = tight;
+    // Tight: one state per dot, cells*8 total. Default: cells*9+1 (with the
+    // legacy in-cell transition state).
+    this.totalStates = tight ? cells * 8 : cells * 9 + 1;
     this.value = this._snap(value ?? min);
     this.palette = PALETTES[palette] || PALETTES.amber;
     this.format = format || ((v) => String(v));
     this.label = label || "";
     this.handlers = [];
     this._build(mount);
+    this.render();
+  }
+
+  // Update min/max in place — used by the studio2 seek slider when a new
+  // preset loads with a different arrangement length. In tight mode the
+  // state index is computed as `value - min`, so updating max changes the
+  // slider's reach without changing the dots-per-bar ratio.
+  setRange({ min, max } = {}) {
+    if (min != null) this.min = min;
+    if (max != null) this.max = max;
+    if (this.value > this.max) this.value = this.max;
+    if (this.value < this.min) this.value = this.min;
     this.render();
   }
 
@@ -230,8 +279,19 @@ export class BrailleSlider {
   }
 
   render() {
-    const pct = (this.value - this.min) / (this.max - this.min) * 100;
-    const state = stateAt(stateIndexForPercent(pct));
+    let stateIndex;
+    if (this.tight) {
+      // Direct 1:1 — slider value (offset from min) IS the dot count, clamped
+      // to the visual capacity (cells*8). Bypasses the percentage formula so
+      // shorter ranges don't stretch to fill the whole bar; instead the bar
+      // fills proportionally and 1 dot always = 1 unit of the slider.
+      stateIndex = Math.max(0, Math.min(this.totalStates - 1, (this.value - this.min) | 0));
+    } else {
+      const pct = (this.value - this.min) / (this.max - this.min) * 100;
+      stateIndex = stateIndexForPercent(pct, this.totalStates);
+    }
+    const stateFn = this.tight ? stateAtTight : stateAt;
+    const state = stateFn(stateIndex, this.cells);
     this.barEl.innerHTML = state.glyphs.map((g, i) =>
       `<span style="color:${this.palette[state.colors[i]]}">${g}</span>`
     ).join("");

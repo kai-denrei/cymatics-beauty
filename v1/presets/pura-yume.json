@@ -1,0 +1,40 @@
+{
+  "schema": "cymatics-studio.preset/1",
+  "id": "pura-yume",
+  "label": "PuraYume — 125 BPM house",
+  "bpm": 125,
+
+  "palette": "# PuraYume — classic 125 BPM house, Roland-flavored synth\n# Translated from a Strudel spec (see meta.strudelSource):\n#   kick:4 four-on-the-floor · ~snare~snare backbeat · hat offbeats\n#   sawtooth melody f3 [g3*2] g#3 d#3 ~ f3 with .lpf(900) .room(0.3)\n# Melody uses 'bass' voice: it IS the engine's sawtooth + resonant LPF\n# combo (sweeps 220 -> 900 -> 180 Hz), so the gritty Roland-synth feel\n# is built in. Reverb is added by 'fx bass reverb 0.3' in the arrangement.\nkick:  x ~ ~ ~  x ~ ~ ~  x ~ ~ ~  x ~ ~ ~\nsnare: ~ ~ ~ ~  x ~ ~ ~  ~ ~ ~ ~  x ~ ~ ~\nchh:   ~ ~ x ~  ~ ~ x ~  ~ ~ x ~  ~ ~ x ~\n# 1-bar melodic loop at 8th notes: f3, g3, g3 (the [g3*2] double), g#3,\n# d#3, rest, f3, rest. The G->G# chromatic move + F->D# fifth interval\n# are the defining gestures.\nbass:  f3 g3 g3 g#3  d#3 ~ f3 ~  /2",
+
+  "arrangement": "@length 64\n\n0   section intro\n0   in kick\n4   in chh\n\n12  section groove\n12  in snare\n16  in bass\n16  fx bass reverb 0.3\n\n24  section warm\n24  filter 6000 6        ; gentle global LPF close — the underground-warehouse depth\n\n32  section break\n32  out kick\n32  filter 1100 8        ; deeper close, kickless\n\n40  section return\n40  in kick\n40  filter 18000 4       ; open the filter back up\n\n48  section roll\n48  euclid kick 11 16    ; busier kick variation for the build\n\n56  section riser\n56  riser 8\n60  filter 18000 4       ; full open into the loop point",
+
+  "meta": {
+    "title": "PuraYume",
+    "genre": "classic house",
+    "key": "F minor (with chromatic G#)",
+    "loopBars": 4,
+    "arrangementBars": 64,
+    "strudelSource": [
+      "setBpm(125);",
+      "const drums = stack(",
+      "  s('kick:4').every(2, inv),",
+      "  s('~ snare:2 ~ snare:2'),",
+      "  s('hat:1*4').gain(0.6)",
+      ");",
+      "const melody = s('sawtooth')",
+      "  .note('f3 [g3*2] g#3 d#3 ~ f3')",
+      "  .lpf(900)",
+      "  .gain(0.25)",
+      "  .room(0.3);",
+      "stack(drums, melody)"
+    ],
+    "translationNotes": {
+      "tempo": "125 BPM, sits in the 120-126 'European club bounce' range called out in the brief.",
+      "every(2, inv)": "Strudel's 'every 2 cycles, invert the kick' adds a 2-bar variation. The studio's pattern grammar has no per-cycle conditional, and a strict inversion of a one-hit-per-cycle kick reads as silence-then-busy rather than 'rolling house'. Dropped in favor of straight 4-on-the-floor + a euclid(11,16) variation in the 'roll' section (bar 48), which gives the same 'kick gets busier' build the inversion gestures at.",
+      "hat:1*4 vs offbeats": "Strudel's *4 puts hats on quarters (with the kicks). Mapped to offbeats here — that's the 'tssss tssss' between-kick hat that defines house. If you prefer quarters, swap chh's pattern to 'x ~ ~ ~  x ~ ~ ~  x ~ ~ ~  x ~ ~ ~'.",
+      "sawtooth + lpf(900)": "The 'bass' voice is the engine's sawtooth-into-resonant-LPF combo. Its envelope sweeps 220 -> 900 -> 180 Hz with Q=8, so the cutoff sits at the requested 900 Hz at the peak of each note. Plays as a Roland-style filtered saw at the f3/g3/d#3 register.",
+      "room(0.3)": "Realized via 'fx bass reverb 0.3' at bar 16 — bass has no default reverb send so it's explicitly opened. The studio's reverb is a 2.4 s convolver."
+    },
+    "voiceCaveats": "If a future build adds a brighter 'lead' voice that better matches the Roland-saw timbre, the melody track can be swapped from 'bass' to that voice with no other change."
+  }
+}

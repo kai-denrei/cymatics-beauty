@@ -1,0 +1,8 @@
+{
+  "schema": "cymatics-studio.preset/1",
+  "id": "greensleeves",
+  "label": "Greensleeves — folk-techno",
+  "bpm": 100,
+  "palette": "kick:  x ~ ~ ~  ~ ~ ~ ~  x ~ ~ ~  ~ ~ ~ ~\nclap:  ~ ~ ~ ~  ~ ~ ~ ~  ~ ~ ~ ~  x ~ ~ ~\nchh:   x ~ x ~  x ~ x ~  x ~ x ~  x ~ x ~\nohh:   ~ ~ ~ ~  ~ ~ ~ ~  ~ ~ ~ ~  ~ ~ ~ x\nbass:  f2 ~ f2 ~  d2 ~ d2 ~  c2 ~ c2 ~  d2 ~ d2 ~  /4\nchord: f3+a3+c4  d3+f3+a3  c3+e3+g3  d3+f3+a3  /16\narp:   f4 c5 a4 c5 f4 c5 a4 c5  d4 a4 f4 a4 d4 a4 f4 a4  c4 g4 e4 g4 c4 g4 e4 g4  d4 a4 f4 a4 d4 a4 f4 a4  /2\nlead:  f5 f5 g5 ~  a5 a5 b5 a5  g5 g5 e5 ~  c5 c5 d5 e5  /4",
+  "arrangement": "@length 64\n0   section intro\n0   in kick\n0   in bass\n8   in chh\n16  section verse-build\n16  in chord\n20  in clap\n24  in arp\n32  section verse-peak\n32  in lead\n40  section refrain-lift\n40  set chord c4+e4+g4 f3+a3+c4 d3+f3+a3 a3+cs4+e4 /16\n40  set bass  c2 ~ c2 ~  f2 ~ f2 ~  d2 ~ d2 ~  a1 ~ a1 ~  /4\n48  section breakdown\n48  out kick\n48  out clap\n48  out arp\n48  filter 1100 6\n56  section riser\n56  riser 8\n56  set chord f3+a3+c4 d3+f3+a3 c3+e3+g3 d3+f3+a3 /16\n56  set bass  f2 ~ f2 ~  d2 ~ d2 ~  c2 ~ c2 ~  d2 ~ d2 ~  /4\n60  filter 18000 4\n60  in kick\n60  in clap\n60  in arp"
+}

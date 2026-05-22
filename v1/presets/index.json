@@ -1,0 +1,39 @@
+{
+  "_schema": "cymatics-studio.preset-index/1",
+  "_doc": [
+    "This file is the manifest the studio loads at startup. Each entry in `presets`",
+    "names a sibling JSON file: ./presets/<id>.json. Adding a preset = drop a new",
+    "JSON in this folder and append its id here.",
+    "",
+    "Preset file format (minimal, all required):",
+    "  { id, label, bpm, palette, arrangement }",
+    "",
+    "  id           string  kebab-case; should match the filename",
+    "  label        string  shown in the dropdown",
+    "  bpm          number  60..200",
+    "  palette      string  multiline, same grammar as studio.html textarea",
+    "  arrangement  string  multiline, same grammar as studio.html textarea",
+    "",
+    "Any other fields (meta, notes, caveats, credits, ...) are ignored by the loader",
+    "and free for authoring. The loader also accepts these legacy fallbacks for",
+    "richer authoring formats:",
+    "  label   <- meta.displayName | meta.title | id",
+    "  bpm     <- meta.bpm",
+    "  palette <- paletteFull | paletteInitial"
+  ],
+  "presets": [
+    "gm-trance",
+    "am-trance",
+    "ambient-72",
+    "dnb-170",
+    "chaconne",
+    "greensleeves",
+    "greensleeves-essence",
+    "plastic-dreams",
+    "plastic-dreams-essence",
+    "pura-yume",
+    "purayumetsuu",
+    "purayumesurii"
+  ],
+  "default": "gm-trance"
+}

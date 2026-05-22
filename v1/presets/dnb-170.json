@@ -1,0 +1,8 @@
+{
+  "schema": "cymatics-studio.preset/1",
+  "id": "dnb-170",
+  "label": "DnB — 170",
+  "bpm": 170,
+  "palette": "kick:  x ~ ~ ~  ~ ~ ~ ~  ~ ~ x ~  ~ ~ ~ ~\nsnare: ~ ~ ~ ~  x ~ ~ ~  ~ ~ ~ ~  x ~ ~ ~\nchh:   x x x x  x x x x  x x x x  x x x x\nohh:   ~ ~ ~ x  ~ ~ ~ ~  ~ ~ ~ x  ~ ~ ~ ~\nbass:  d2 ~ ~ d2  ~ ~ d2 ~  ~ d2 ~ ~  d2 ~ ~ d2\nchord: d3+f3+a3  d3+f3+a3  g3+bb3+d4  d3+f3+a3  /16\narp:   d4 a4 f4 a4  d4 a4 f4 a4  g4 d5 bb4 d5  d4 a4 f4 a4\nlead:  ~ /16",
+  "arrangement": "@length 64\n0   section intro\n0   in kick\n0   in chh\n8   section build\n8   in bass\n12  in ohh\n16  in snare\n24  in chord\n32  section peak\n32  clone bass lead 12\n32  in lead\n36  fx lead delay 0.55\n48  section roll\n48  euclid kick 13 16\n56  filter 3000 8\n60  riser 4"
+}

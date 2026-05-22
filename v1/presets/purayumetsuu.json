@@ -1,0 +1,44 @@
+{
+  "schema": "cymatics-studio.preset/1",
+  "id": "purayumetsuu",
+  "label": "PuraYumeTsuu — deep tritone (129)",
+  "bpm": 129,
+
+  "palette": "# PuraYumeTsuu — Plastic Dreams essence portrait, deep-tritone version\n# Transcribed from an Ableton screenshot ('Main Organ Low' clip, 129 BPM,\n# 4/4, 16-bar loop). Pitch set: C2, D#2 (eb2), F2, F#2 (fs2). The F#\n# tritone (#4) is THE hook. Riff lives in octave 2 — felt as much as heard.\n# 'organ' is aliased to 'lead' (no organ voice in engine); 'gong' track is\n# preserved with its name and stays silent until a gong voice exists.\nkick: x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ /1\n# the spine: deep low riff, the ONLY melodic element. circles every 4 bars.\nlead: c2 ~ ~ ~  eb2 eb2 ~ ~  ~ ~ ~ ~  eb2 eb2 eb2 ~ c2 ~ c2 ~  ~ ~ ~ ~  eb2 ~ ~ ~  ~ ~ ~ ~ c2 ~ ~ ~  eb2 eb2 eb2 ~  ~ ~ ~ ~  eb2 ~ ~ ~ c2 ~ c2 ~  ~ ~ ~ ~  eb2 eb2 ~ ~  ~ ~ ~ ~ /1\n# rare punctuation — a single gong boom (silent until gong voice exists).\ngong: x ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ /1\n# the LATE, only addition: one sparse offbeat hat, soft, near the end.\nchh: ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ ~ ~ x ~ /1",
+
+  "arrangement": "@length 64\n\n0   section call            ; gong + low riff + kick land like a call to the floor\n0   in gong\n0   in kick\n0   in lead\n# bars 1-8 equivalent: the riff broods LOW on C2/D#2. nothing added. the emptiness is the hook.\n\n16  section reach-1         ; the riff begins to reach up — F2/F#2 tritone enters. no new tracks.\n16  set lead c2 ~ f2 ~  fs2 ~ ~ ~  eb2 ~ ~ ~  c2 ~ ~ ~ c2 ~ f2 ~  fs2 fs2 ~ ~  eb2 ~ c2 ~  ~ ~ ~ ~ c2 ~ ~ ~  eb2 eb2 ~ ~  fs2 ~ ~ ~  eb2 ~ c2 ~ c2 ~ f2 ~  fs2 ~ eb2 ~  c2 ~ ~ ~  eb2 ~ ~ ~ /1\n\n32  section reach-2         ; gong returns once; riff keeps circling higher\n32  in gong\n\n48  section reach-3         ; the single sparse hat enters, soft. still never busy.\n48  in chh\n48  gain chh 0.45 4\n# loop: back to the LOW brood = the cycle resets. no drop, no breakdown. the trance is the point.\n# NET: the riff EVOLVES BY REACHING UP (low -> tritone), exactly the two-half form in the source.",
+
+  "meta": {
+    "title": "Plastic Dreams (essence portrait, deep tritone)",
+    "essence": "ONE deep organ riff (register: octave 2, DEEP) on a 4-note C-minor set C2 / D#2(b3) / F2(4) / F#2(#4 tritone blue-note) over a steady four-on-the-floor. The F# tritone is the signature jazzy tension. Form: bars 1-8 brood LOW on C2/D#2 only; bars 9-16 reach UP, adding F2/F#2. Evolution = the riff reaching higher, not layers piling on.",
+    "inspiration": "Jaydee — 'Plastic Dreams' (1992). COPYRIGHTED work; this is an inspired-by homage using the generic four-on-floor idiom + an ORIGINAL circling riff evoking the deep-organ character, NOT a transcription.",
+    "sourceOfTruth": "Transcribed from a user-provided Ableton screenshot of a Plastic Dreams recreation ('Main Organ Low' clip, 129 BPM, 4/4, 16-bar loop). Pitch set C2/D#2/F2/F#2 and the low->high two-half form are read directly from the piano roll, not guessed.",
+    "key": "C", "mode": "minor", "loopBars": 4, "arrangementBars": 64,
+    "pitchSet": "C2, D#2 (=eb2), F2, F#2 (=fs2). C minor with the #4 tritone as the hook.",
+    "designPrinciple": "ESSENCE-FIRST, NOT TEMPLATE. RESTRAINT IS THE RULE. Only kick + the single organ riff + a rare gong. NO chord stabs, NO arp, NO busy hats, NO section-swap drama.",
+    "originalInstruments": {
+      "organ": "Renamed to 'lead' here because the engine has no organ voice. Intended timbre: deep drawbar/Hammond, octave 2, stacked sines, percussive attack, slight chorus/vibrato. The register is essential — this riff is felt as much as heard. Synth-voice task, flagged.",
+      "gong": "Track kept with original name; currently silent because the engine has no gong voice. 'in gong' cues are no-ops until a voice is added."
+    },
+    "accidentalReminder": "eb2 = D#2 ; fs2 (or f#2) = F#2."
+  },
+
+  "essenceNotes": {
+    "whatChangedVsFailedVersion": "Earlier essence guess used c/eb/g/bb (generic minor pentatonic, mid register) and missed it. The REAL riff is an octave lower, on C2/D#2/F2/F#2, and its hook is the F# tritone (#4) plus the low->high two-half form. Harmonizing it 'correctly' before destroyed the character; the actual riff is harmonically weirder and that weirdness IS the hook.",
+    "whyMutationNotLayering": "Hypnosis comes from sameness; interest comes from slow change to the SAME element. The riff evolves in place (low->high reach) while the texture stays nearly empty.",
+    "theGong": "Punctuation, not groove. Rare hits mark sections like the original's opening gong-call.",
+    "cymaticsCoupling": "A near-static spectrum dominated by one octave-2 riff = a steady, slowly-breathing field that shifts subtly as the riff reaches up into the tritone. The visual hypnotism mirrors the musical hypnotism — exactly because nothing busy is competing."
+  },
+
+  "caveats": {
+    "copyright": "Original is copyrighted; this reproduces only the generic four-on-floor idiom + an ORIGINAL riff evoking the character. Homage, not cover.",
+    "swing": "House sits slightly behind the grid; the straight 16th grid can't swing (engine feature). Straight here — logged.",
+    "restraintIsFragile": "Resist the urge to 'improve' this by adding parts. If it starts sounding busy, the essence is lost. Any addition must be tiny and late."
+  },
+
+  "lessonsForSkill": [
+    "When a transcription source exists (screenshot/MIDI/score), READ IT — do not harmonize from theory. The real Plastic Dreams riff omits the 5th and 7th and leans on a #4 tritone in octave 2; no amount of 'sensible' minor-pentatonic guessing would have found that. Register and the 'wrong' note are often the essence.",
+    "ESSENCE-FIRST RULE: one melodic track, minimal everything else; development by MUTATING the core element, not by adding layers.",
+    "Signature timbre is a recurring separate task (Hammond organ at octave 2) — always flag it."
+  ]
+}

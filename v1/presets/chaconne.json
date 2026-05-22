@@ -1,0 +1,8 @@
+{
+  "schema": "cymatics-studio.preset/1",
+  "id": "chaconne",
+  "label": "Chaconne — D-minor solemn",
+  "bpm": 124,
+  "palette": "kick:  x ~ ~ ~  x ~ ~ ~  x ~ ~ ~  x ~ ~ ~\nsnare: ~ ~ ~ ~  x ~ ~ ~  ~ ~ ~ ~  x ~ ~ ~\nbass:  d2 d2 d2 d2  a1 a1 a1 a1  bb1 bb1 bb1 bb1  a1 a1 a1 a1  /4\nchord: d3+f3+a3+d4  a3+cs4+e4+a4  bb3+d4+f4+bb4  a3+cs4+e4+a4  /16\narp:   d4 f4 a4 f4 a4 f4 d4 f4  a4 cs5 e5 cs5 e5 cs5 a4 cs5  bb4 d5 f5 d5 f5 d5 bb4 d5  a4 cs5 e5 cs5 e5 cs5 a4 cs5  /2\nlead:  a4 ~ a4 ~  e5 ~ e5 ~  f5 ~ d5 ~  a4 ~ ~ ~  /4",
+  "arrangement": "@length 64\n0   section ground\n0   in kick\n0   in bass\n16  section build\n16  in chord\n20  in snare\n24  in arp\n24  set bass  d2 d2 d2 d2  c2 c2 c2 c2  bb1 bb1 bb1 bb1  a1 a1 a1 a1  /4\n24  set chord d3+f3+a3+d4  c3+e3+g3+c4  bb3+d4+f4+bb4  a3+cs4+e4+a4  /16\n32  section peak\n32  in lead\n40  section major-lift\n40  out kick\n40  out snare\n40  out arp\n40  set chord d3+fs3+a3+d4  a3+cs4+e4+a4  g3+b3+d4+g4  a3+cs4+e4+a4  /16\n40  set bass  d2 d2 d2 d2  a1 a1 a1 a1  g1 g1 g1 g1  a1 a1 a1 a1  /4\n40  filter 1200 6\n52  section riser\n52  riser 8\n56  set chord d3+f3+a3+d4  a3+cs4+e4+a4  bb3+d4+f4+bb4  a3+cs4+e4+a4  /16\n56  set bass  d2 d2 d2 d2  a1 a1 a1 a1  bb1 bb1 bb1 bb1  a1 a1 a1 a1  /4\n56  filter 18000 4\n60  in kick\n60  in snare\n60  in arp"
+}
